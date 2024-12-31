@@ -1,73 +1,26 @@
-from django.urls import path
-from . import views
+"""
+URL configuration for complaint project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/5.1/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path,include
+# from django.views.generic import RedirectView
 
 urlpatterns = [
-
-    path('', views.login, name='login'),
-    path('addusers/', views.superadmin, name='superadmin'),
-    path('superadmindashboard/', views.superadmindashboard, name='superadmindashboard'),
-    path('resolver/<int:complaint_id>/', views.resolver, name='resolver'),
-    path('resolverdashboard/', views.resolver_dashboard, name='resolverdashboard'),
-    path('download_resolution_reports_csv/', views.download_resolution_reports_xlsx, name='download_resolution_reports_xlsx'),
-    path('download_resolution_reports/',views.download_filtered_resolution_reports_xlsx,name='download_filtered_resolution_reports_xlsx'),
-    path('managecomplaints/', views.user, name='user'),
-    path('userdashboard/', views.user_dashboard, name='userdashboard'),
-    path('raisecomplaint/', views.complain, name='complain'),
-    path('complain/<int:complaint_id>/', views.complainview, name='complainview'), 
-    path('adduser/', views.adduser, name='adduser'),
-    path('reports/', views.reports, name='reports'),
-    path('delete_user/<int:user_id>/', views.delete_user, name='delete_user'),
-    path('edit/<int:user_id>/', views.edit_user, name='edit'),
-    path('editcomplain/<int:complaint_id>/', views.editcomplain, name='editcomplain'),
-    path('logout/', views.logout_view, name='logout'),
-    path('some-view/', views.some_view, name='some_view'),
-    path('update-complaint-status/<int:complaint_id>/', views.update_complaint_status, name='update_complaint_status'),
-    path('deletecomplain/<int:complaint_id>/', views.delete_complaint, name='deletecomplain'),
-    path('locations/', views.location_list, name='locations'),
-    path('departments/', views.department_list, name='departments'),
-    path('status/', views.status_list, name='status'),
-    path('complaint_types/', views.complaint_type_list, name='complaint_types'),
-    path('user_reports/',views.filtered_user_reports,name='filtered_user_reports'),
-    path('resolver_reports',views.filtered_resolver_reports,name = 'filtered_resolver_reports'),
-    path('editlocation/<int:location_id>/', views.edit_location, name='edit_location'),
-    path('deletelocation/<int:location_id>/', views.delete_location, name='delete_location'),
-    path('editdepartment/<int:department_id>/',views.edit_department,name = 'edit_department'),
-    path('deletedepartment/<int:department_id>/',views.delete_department,name = 'deletedepartment'),
-    path('editcomplainttype/<int:complaint_type_id>/',views.edit_complaint_type,name = 'edit_complaint_type'),
-    path('deletecomplainttype/<int:complaint_type_id>/',views.delete_complaint_type,name = 'delete_complaint_type'),
-    path('editstatus/<int:status_id>/',views.edit_status,name='edit_status'),
-    path('deletestatus/<int:status_id>/',views.delete_status,name='delete_status'),
-    path('pending-complaints/', views.pending_complaints_view, name='pending_complaints'),
-    path('inprogress-complaints/', views.in_progress_complaints_view, name='inprogress_complaints'),
-    path('resolved-overtime/', views.resolved_overtime_complaints_view, name='resolved_overtime'),
-    path('resolved-withintime/', views.resolved_within_time_complaints_view, name='resolved_withintime'),
-    path('totalcomplaints/',views.all_complaints_view,name='totalcomplaints'),
-    path('resolvedcomplaints/', views.resolver_complaints_view, name='resolver_complaints'),
-    path('resolvedwithintime/', views.resolved_within_time_view, name='resolverwithintime'),
-    path('resolvedovertime/', views.resolved_over_time_view, name='resolverovertime'),
-    path('pendingresolvercomplaint/',views.pending_resolver_complaint,name='pendingresolvercomplaint'),
-    path('inprogressresolvercomplaint/',views.inprogress_resolver_complaint,name='inprogressresolvercomplaint'),
-    path('totalusercomplaints/',views.user_complaints,name='totalusercomplaints'),
-    path('pendingusercomplaints/',views.pending_user_complaints,name='pendingusercomplaints'),
-    path('inprogressusercomplaints/',views.inprogress_user_complaints,name='inprogressusercomplaints'),
-    path('resolvedwithintimeusercomplaints/',views.resolvedwithintime_user_complaints,name='resolvedwithintimeusercomplaints'),
-    path('resolvedovertimeusercomplaints/',views.resolvedovertime_user_complaints,name='resolvedovertimeusercomplaints'),
-    path('resolvercharts/',views.resolvercharts,name='resolvercharts'),
-    path('getcomplainttypes',views.getcomplainttypes,name='getcomplainttypes'),
-    path('login2',views.login2,name='login2'),
-    path('summaryreport/',views.summaryreport,name='summaryreport'),
-    path('detailreport/',views.detailed_superadmin_reports,name='detailreport'),
-
-    path('office_timings/', views.manage_office_timings, name='manage_office_timings'),  # For adding and listing office timings
-    path('edit_office_timing/<int:office_timing_id>/', views.edit_office_timing, name='edit_office_timing'),
-    path('delete_office_timing/<int:office_timing_id>/', views.delete_office_timing, name='delete_office_timing'),
-
-    path('publicholidays/', views.publicholidays, name='publicholidays'),
-    # path('editholiday/<int:holiday_id>/', views.edit_public_holiday, name='edit_public_holiday'),
-    # path('deleteholiday/<int:holiday_id>/', views.delete_public_holiday, name='delete_public_holiday'),
-
-    path('detailedresolverreports',views.detailed_resolver_reports,name='detailed_resolver_reports'),
-    path('detaileduserreports',views.detailed_userreports,name='detailed_user_reports'),
-    path('sendemail/',views.send_email, name='sendemail'),
-    
+    path('admin/', admin.site.urls),
+    # path('', RedirectView.as_view(url='/login/', permanent=False)),
+    path('', include('app.urls')),
+   
 ]
