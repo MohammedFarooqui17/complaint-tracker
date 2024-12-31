@@ -1,0 +1,377 @@
+{% extends "sidebarR.html" %}
+
+{% block styles %}
+<style>
+  /* Head Title Styles */
+  .head-title {
+    margin-bottom: 20px; /* Space below the title */
+  }
+
+  .head-title h1 {
+    font-weight: bold; /* Bold title */
+    font-size: 35px; /* Adjust font size if needed */
+    margin: 0 0 35px 20px; /* Remove default margin */
+  }
+
+  /* Header styling */
+  .header-container {
+    display: flex;
+    justify-content: space-between; /* Space between elements */
+    align-items: center;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+  /* Card Container Styles */
+  .card-container1 {
+    display: flex; /* Flexbox for horizontal layout */
+    gap: -1px; /* Space between cards */
+    margin-top: 12px; /* Space above cards */
+    flex-wrap: wrap; /* Allow wrapping */
+    margin-left: 20px; /* Adjust this value to shift cards to the right */
+  }
+
+  /* Card Styles */
+  .card {
+    padding: 12px; /* Reduced padding */
+    border-radius: 8px; /* Border radius */
+    color: white;
+    text-align: center; /* Center text */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+    flex: 4 8 50px; /* Fixed width of 120px */
+    height: 120px; /* Reduced height */
+    display: flex; /* Use flexbox for centering */
+    flex-direction: column; /* Stack elements vertically */
+    justify-content: center; /* Center content vertically */
+    margin-left: 1.5%;
+    margin-right: 1.5%;
+  }
+
+  .card:hover {
+    transform: translateY(-3px); /* Slight hover effect */
+    border: 2px solid rgba(255, 255, 255, 0.3); /* Light border on hover */
+  }
+
+  /* Card Background Colors */
+  .total-complaints {
+    background-color: #2f3d4c; /* Blue */
+  }
+
+  .in-progress {
+    background-color: #967c2e; /* Amber */
+  }
+
+  .done {
+    background-color: #011004; /* Green */
+  }
+
+  .overdue {
+    background-color: #310408; /* Red */
+  }
+  .resolvedoverdue{
+    background-color: #c05f1e;
+  }
+
+  .table-container {
+    max-width: 1200px; /* Width for the tables */
+    margin: auto; /* Center the tables */
+    margin-bottom: 40px; /* Space between tables */
+    border-radius: 5px; /* Rounded corners */
+    padding: 20px; /* Inner spacing */
+    height: auto;
+    min-height: 380px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    background-color: transparent; /* White background */
+}
+
+
+  .scrollable-table {
+    max-height: 300px; /* Set a fixed height for scrolling */
+    margin-bottom: 20px; /* Space between table and pagination */
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+
+th {
+  background-color: #f4f4f4; /* Light gray for header */
+  color: #333; /* Dark text for better readability */
+  font-weight: bold;
+}
+
+  #complaintSearch {
+    width: 250px; /* Width for the search bar */
+    height: 40px; /* Height for the search bar */
+    padding: 10px;
+    border: 2px solid #007BFF;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+
+  .view-button {
+    background-color: #007BFF;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none; /* No underline for the link */
+  }
+
+  .view-button:hover {
+    background-color: #0056b3; /* Darker on hover */
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 10px; /* Space above pagination */
+  }
+
+  .pagination button {
+    padding: 8px 16px;
+    border: none;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+    margin-left: 5px;
+  }
+
+  .pagination button:disabled {
+    background-color: #007BFF;
+    cursor: not-allowed;
+  }
+
+  #pageInfo {
+    margin: 0 10px;
+  }
+
+  /* Example color coding for statuses */
+  .status-pending {
+    color: #FF8C00; /* Orange for Pending */
+    font-weight: bold;
+  }
+
+  .status-progress {
+    color: #8a7605d0; /* Golden Yellow for Work in Progress */
+    font-weight: bold;
+  }
+
+  .status-overdue {
+    color: #FF4500; /* Red for Overdue */
+    font-weight: bold;
+  }
+
+  .status-resolved {
+    color: #32CD32; /* Green for Resolved */
+    font-weight: bold;
+  }
+
+  th {
+    background-color: #f4f4f4;
+    padding-right: 30px; /* Add space to the right for the sorting icon */
+    position: relative; /* To position the icon inside the th */
+  }
+
+  .sort-indicator {
+    position: absolute;
+    right: 10px; /* Space from the right edge */
+    top: 50%;
+    transform: translateY(-50%); /* Vertically center the icon */
+    cursor: pointer;
+    display: inline-block; /* Ensure icon aligns properly with text */
+  }
+
+  th span {
+    margin-right: 5px; /* Add some space between the heading text and icon */
+  }
+
+  .table-container {
+    margin-top: 15px;  /* Adjust this value to move the container up */
+    width: 1300px;
+  }
+
+  .dataTables_filter {
+    margin-top: 1px;  /* Adjust this value to control vertical position */
+  }
+
+  .dataTables_filter label {
+    margin-left: -45px;  /* Adjust this value to move label to the left */
+  }
+
+  .dataTables_filter input {
+    margin-left: -15px;  /* Adjust this value to move input box to the left */
+  }
+
+  .filter-form {
+    display: flex;
+    gap: 10px; /* Space between inputs and button */
+    align-items: center;
+  }
+
+  .filter-form input[type="date"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .filter-form button {
+    padding: 8px 16px;
+    border: none;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .filter-form button:hover {
+    background-color: #0056b3;
+  }
+
+  form {
+    display: flex;
+    justify-content: space-between; /* Space between title and input fields */
+    align-items: center; /* Vertically center the elements */
+    margin-bottom: 20px; /* Space below the form */
+  }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header-container">
+  <div class="head-title">
+    <h1>Timely Resolutions</h1>
+  </div>
+</div>
+
+<div class="table-container">
+  <table id="resolvedWithinTimeTable" class="display">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Dept</th>
+        <th>Location</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Raised Date</th>
+        <th>Due Date</th>
+        <th>Resolved At</th>
+        <th>Resolved By</th>
+        <th>Status</th>
+        <th>Resolution</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for complaint in resolved_within_time %}
+          <tr>
+            <td>{{ complaint.complainant_name }}</td>
+            <td>{{ complaint.department }}</td>
+            <td>{{ complaint.location }}</td>
+            <td>{{ complaint.complaint_type }}</td>
+            <td>{{ complaint.description }}</td>
+            <td>{{ complaint.date }}</td>
+            <td>{{ complaint.due_date }}</td>
+            <td>{{ complaint.updated_at }}</td>
+            <td>{{ complaint.resolved_by_name }}</td>
+            <td class="status-{{ complaint.status|lower }}">
+                {% if complaint.status|lower == 'resolved' %}
+                  <i class="fas fa-check-circle" style="color:#32CD32;"></i>
+                {% endif %}
+                {{ complaint.status|capfirst }}
+              </td>
+            <td>{{ complaint.resolution }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="11">No complaints resolved within time for this resolver's location.</td>
+          </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block script %}
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
+<!-- DataTables Buttons CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+
+<!-- DataTables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+
+<!-- JSZip for Excel export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<!-- PDFMake for PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+
+<script>
+  $(document).ready(function () {
+    // Initialize DataTables for complaintTable
+    $('#resolvedWithinTimeTable').DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        responsive: true,
+        lengthMenu: [5, 10, 25, 50],  // Controls how many rows are shown per page
+        columnDefs: [
+            { orderable: false, targets: -1 }  // Makes the last column non-orderable (Resolved By column)
+        ],
+        language: {
+            search: "Search Complaint:",
+            lengthMenu: "Display _MENU_ records per page",
+            zeroRecords: "No complaints found",
+            info: "Showing _START_ to _END_ of _TOTAL_ complaints",
+            infoEmpty: "No records available",
+            paginate: {
+                previous: "Previous",
+                next: "Next"
+            }
+        },
+        initComplete: function() {
+            // Apply custom CSS styles to move the search box label and input up
+            $('#resolvedWithinTimeTable_filter label').css({
+                'position': 'relative',
+                'top': '-8px',  // Adjust the value as needed to move the search box up
+                'left': '0'
+            });
+            $('#resolvedWithinTimeTable_filter input').css({
+                'position': 'relative',
+                'top': '-3px'  // Adjust the value as needed to move the search box up
+            });
+        }
+    });
+  });
+</script>
+
+<script type="text/javascript">
+  // This script will force a redirect to login if the user navigates back
+  if (!sessionStorage.getItem('loggedIn')) {
+    window.location.href = "{% url 'login' %}";
+  }
+</script>
+{% endblock %}

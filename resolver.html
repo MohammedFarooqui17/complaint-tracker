@@ -1,0 +1,390 @@
+{% extends "sidebarR.html" %}
+
+
+
+{% block styles %}
+<style>
+  .resolution-container {
+    padding: 20px;
+    width: 100%; /* Responsive width */
+    max-width: 1050px; /* Max width for larger screens */
+    height: auto; /* Ensure dynamic height */
+    min-height: 60vh; /* Minimum height for better appearance */
+    margin: 0vh auto 50px; /* Added bottom margin for spacing */
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    display: flex;
+    flex-direction: column; /* Ensure layout consistency */
+    justify-content: space-between; /* Space between content */
+  }
+
+
+
+  form {
+    margin-bottom: 50px; /* Added margin to the bottom of the form */
+  }
+
+
+
+  h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.8em; /* Scalable font size */
+  }
+
+
+
+  .complaint-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Dynamic columns */
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+
+
+  .details-item {
+    font-size: 1rem;
+    color: #333;
+    word-wrap: break-word; /* Handle long text gracefully */
+  }
+
+
+
+  .details-item strong {
+    color: #000;
+  }
+
+
+
+  .form-section {
+    margin-top: 20px;
+  }
+
+
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+
+
+  input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    height: 45px;
+  }
+
+
+
+  textarea {
+    resize: vertical;
+  }
+
+
+
+  .form-buttons {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+
+
+  .btn-submit, .btn-back-to-list {
+    padding: 12px 20px;
+    font-size: 1rem;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+  }
+
+
+
+  .btn-submit {
+    background-color: #0e3457;
+  }
+
+
+
+  .btn-submit:hover {
+    background-color: #0e3457;
+  }
+
+
+
+  .btn-back-to-list {
+    background-color: #0e3457;
+  }
+
+
+
+  .btn-back-to-list:hover {
+    background-color: #0e3457;
+  }
+
+
+
+  @media (max-width: 768px) {
+    .resolution-container {
+      width: 95%;
+      padding: 15px;
+      margin-bottom: 30px; /* Ensure bottom spacing on smaller screens */
+    }
+
+
+
+    h1 {
+      font-size: 1.5em;
+    }
+
+
+
+    .complaint-details {
+      grid-template-columns: 1fr;
+    }
+
+
+
+    .form-buttons {
+      flex-direction: column; /* Stack buttons on smaller screens */
+    }
+
+
+
+    .btn-submit, .btn-back-to-list {
+      width: 100%; /* Full width for buttons */
+    }
+  }
+
+
+
+  .status-due-container {
+    display: flex;
+    justify-content: space-between; /* Distribute items evenly */
+    gap: 20px; /* Add space between input boxes */
+    align-items: center; /* Align vertically */
+    margin-bottom: 20px; /* Add spacing below the row */
+  }
+
+
+
+  .form-group-inline {
+    flex: 1; /* Allow equal space for both fields */
+    display: flex;
+    flex-direction: column; /* Keep label above the input */
+  }
+
+
+
+  label {
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+
+
+
+  input, select {
+    width: 100%;
+  }
+
+
+
+  .form-buttons {
+    display: flex;
+    justify-content: space-between; /* Place buttons on opposite ends */
+    align-items: center;
+    margin-top: 20px;
+  }
+
+
+
+  .btn-back-to-list {
+    margin-left: auto; /* Push the button to the right */
+  }
+ #resolution {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    height: 100px; /* Default height */
+    min-height: 150px; /* Increase minimum height */
+    resize: vertical; /* Allow vertical resizing */
+  }
+</style>
+
+
+
+
+
+{% endblock %}
+
+
+
+{% block content %}
+<div class="resolution-container">
+  <h1>Resolve Complaint</h1>
+
+
+
+  <div class="complaint-details">
+    <div class="details-item"><strong>Name:</strong> {{ complaint.user_name }}</div>
+    <div class="details-item"><strong>Department:</strong> {{ complaint.department }}</div>
+    <div class="details-item"><strong>Location:</strong> {{ complaint.location }}</div>
+    <div class="details-item"><strong>Complaint Type:</strong> {{ complaint.complaint_type }}</div>
+    <div class="details-item"><strong>Issue Raise Date:</strong> {{ complaint.issue_raise_date }}</div>
+    <div class="details-item"><strong>Due Date:</strong> {{ complaint.due_date }}</div>
+    <div class="details-item"><strong>Description:</strong> {{ complaint.description }}</div>
+  </div>
+
+
+
+  <form action="" method="post">
+    {% csrf_token %}
+
+
+
+    <div class="form-section">
+      <div class="status-due-container">
+        <div class="form-group form-group-inline">
+          <label for="updated_due_date">Updated Due Date:</label>
+          <input type="datetime-local" id="updated_due_date" name="updated_due_date" 
+                 value="{{ complaint.updated_due_date|date:'Y-m-d\TH:i' }}" required 
+                 min="" 
+                 step="600" 
+                 oninput="validateDueDate(this)">
+          <div id="due_date_error_message" style="color: red; display: none;">
+            Please select a due date within business hours (Mon-Fri, 9 AM - 6 PM).
+          </div>
+        </div>
+
+
+
+        <div class="form-group form-group-inline">
+          <label for="status">Status:</label>
+          <select name="status" id="status" required {% if not is_admin %}disabled{% endif %}>
+            <option value="">Select Status</option>
+            {% for status in statuses %}
+            <option value="{{ status }}" {% if complaint.status == status %}selected{% endif %}>{{ status }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+
+
+      <div class="form-group">
+        <label for="reason">Reason:</label>
+        <textarea name="reason" id="reason" placeholder="Enter reason here..." required {% if not is_admin %}disabled{% endif %}>{{ complaint.reason }}</textarea>
+      </div>
+
+
+
+      <div class="form-group">
+        <label for="resolution">Resolution:</label>
+        <textarea name="resolution" id="resolution" placeholder="Enter your resolution here..." required {% if not is_admin %}disabled{% endif %}>{{ complaint.resolution }}</textarea>
+      </div>
+    </div>
+
+
+
+    <div class="form-buttons">
+      {% if is_admin %}
+      <button type="submit" class="btn-submit">Submit Resolution</button>
+      {% endif %}
+      <a href="{% url 'resolverdashboard' %}" class="btn-back-to-list">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const dueDateAdjustmentSelect = document.getElementById('due_date_adjustment');
+    const dueDateInput = document.getElementById('updated_due_date');
+    const errorMessage = document.getElementById('due_date_error_message');
+
+
+    // Get the current due date from the complaint object (existing due date)
+    const complaintDueDate = new Date("{{ complaint.due_date|date:'Y-m-d H:i:s' }}");
+
+
+    // Function to calculate the new due date based on selected adjustment
+    function adjustDueDate() {
+      const adjustment = parseInt(dueDateAdjustmentSelect.value);
+      const newDueDate = new Date(complaintDueDate);
+
+
+      // Add the selected adjustment (in hours or days)
+      if (adjustment === 0) {
+        dueDateInput.value = complaintDueDate.toISOString().slice(0, 16);  // No change, set to original
+      } else if (adjustment <= 24) {
+        newDueDate.setHours(newDueDate.getHours() + adjustment);  // Adjust by hours
+        dueDateInput.value = newDueDate.toISOString().slice(0, 16);  // Update input field with new due date
+      } else {
+        newDueDate.setDate(newDueDate.getDate() + adjustment / 24);  // Adjust by days
+        dueDateInput.value = newDueDate.toISOString().slice(0, 16);  // Update input field with new due date
+      }
+    }
+
+
+    // Event listener to adjust the due date when the user selects a new adjustment
+    dueDateAdjustmentSelect.addEventListener('change', adjustDueDate);
+
+
+    // Initialize the due date when the page loads
+    adjustDueDate();
+
+
+    // Restrict time selection to business hours (9 AM - 6 PM) Mon-Fri
+    function validateDueDate(input) {
+      const selectedDate = new Date(input.value);
+      const day = selectedDate.getDay();  // 0 (Sunday) to 6 (Saturday)
+      const hours = selectedDate.getHours();
+      
+      // Check if the day is a weekend (Saturday or Sunday)
+      if (day === 0 || day === 6) {
+        errorMessage.style.display = 'block';
+        input.setCustomValidity("Please select a date within business hours (Mon-Fri, 9 AM - 6 PM).");
+      } else {
+        // Check if the time is outside 9 AM to 6 PM
+        if (hours < 9 || hours >= 18) {
+          errorMessage.style.display = 'block';
+          input.setCustomValidity("Please select a time between 9 AM and 6 PM.");
+        } else {
+          errorMessage.style.display = 'none';
+          input.setCustomValidity("");  // Clear the error message
+        }
+      }
+    }
+
+
+    // Initialize the validation when the page loads
+    validateDueDate(dueDateInput);
+
+
+    // Add event listener to revalidate when the user selects a new date
+    dueDateInput.addEventListener('input', function() {
+      validateDueDate(dueDateInput);
+    });
+  });
+</script>
+
+
+{% endblock %}
+

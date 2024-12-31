@@ -1,0 +1,1098 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="//cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="//code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="//cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    
+  <title>Complaint Tracker</title>
+
+
+  <!--font awesome-->
+  
+
+
+  <!--css file-->
+  
+  <style>
+    /* Created by Tivotal */
+   
+    /* Google Fonts(Poppins & Lato) */
+    @import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap");
+
+
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      list-style: none;
+      text-decoration: none;
+      transition: 0.3s linear;
+    }
+
+
+
+    :root {
+      --poppins: "Poppins", sans-serif;
+      --lato: "Lato", sans-serif;
+
+
+
+      --light: #f9f9f9;
+      --blue: #3c91e6;
+      --light-blue: #cfe8ff;
+      --grey: #eee;
+      --dark-grey: #aaaaaa;
+      --dark: #342e37;
+      --red: #db504a;
+      --yellow: #ffce26;
+      --light-yellow: #fff2c6;
+      --orange: #fd7238;
+      --light-orange: #ffe0d3;
+    }
+
+
+
+    html {
+      overflow-x: hidden;
+    }
+
+
+
+    body {
+      background: #ffffff;
+      overflow-x: hidden;
+    }
+
+
+
+    body.dark {
+      --light: #0c0c1e;
+      --grey: #060714;
+      --dark: #fbfbfb;
+    }
+
+
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background:#0e3152;
+      height: 100%;
+      width: 280px;
+      z-index: 2000;
+      font-family: var(--lato);
+      transition: 0.3s ease;
+      overflow-x: hidden;
+      scrollbar-width: none;
+    }
+
+
+
+    .sidebar.hide {
+      width: 60px;
+    }
+
+
+
+   
+    .sidebar .logo {
+      font-size: 24px;
+      font-weight: 700;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      color: white;
+      position: sticky;
+      top: 0;
+      left: 0;
+      background: #0e3152;
+      z-index: 500;
+      padding-bottom: 20px;
+      box-sizing: content-box;
+      margin-top: 10px;
+    }
+
+
+
+    .sidebar .logo i {
+      min-width: 60px;
+      display: flex;
+      justify-content: center;
+    }
+
+
+
+    .sidebar .side-menu {
+      width: 100%;
+      margin-top: 48px;
+    }
+
+
+
+    .sidebar .side-menu li {
+      height: 48px;
+      margin-left: 6px;
+      background: transparent;
+      border-radius: 48px 0 0 48px;
+      padding: 4px;
+    }
+
+
+
+    .sidebar .side-menu li.active {
+      position: relative;
+      background: #ffffff;
+    }
+
+
+
+    .sidebar .side-menu li.active::before {
+      content: "";
+      position: absolute;
+      height: 40px;
+      width: 40px;
+      border-radius: 50%;
+      right: 0;
+      top: -40px;
+      z-index: -1;
+      box-shadow: 20px 20px 0 #ffffff;
+    }
+
+
+
+    .sidebar .side-menu li.active::after {
+      content: "";
+      position: absolute;
+      height: 40px;
+      width: 40px;
+      border-radius: 50%;
+      right: 0;
+      bottom: -40px;
+      z-index: -1;
+      box-shadow: 20px -20px 0 #ffffff;
+    }
+
+
+
+    .sidebar .side-menu li a {
+      height: 100%;
+      width: 100%;
+      background: #0e3152;
+      display: flex;
+      align-items: center;
+      border-radius: 48px;
+      font-size: 16px;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow-x: hidden;
+    }
+
+
+
+    .sidebar.hide .side-menu li a {
+      width: calc(48px - (4px * 2));
+      transition: 0.3s ease;
+    }
+
+
+
+    .sidebar .side-menu li.active a {
+      /* color: var(--blue); */
+      background: #ffffff;
+      color: black;
+
+
+
+    }
+
+
+
+    .sidebar .side-menu.top li a:hover {
+      color: var(--blue);
+    }
+
+
+
+    .sidebar .side-menu li a.logout {
+      color: white;
+      font-weight: 20px;
+      font-size: 18px;
+    }
+
+
+
+    .sidebar .side-menu li a i {
+      min-width: calc(60px - ((4px + 6px) * 2));
+      display: flex;
+      justify-content: center;
+    }
+
+
+
+    .content {
+      position: relative;
+      width: calc(100% - 280px);
+      left: 280px;
+      transition: 0.3s ease;
+    }
+
+
+
+    .sidebar.hide~.content {
+      width: calc(100% - 60px);
+      left: 60px;
+    }
+
+
+
+    .content nav {
+      height: 86px;
+      background: #0e3152;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      font-family: var(--lato);
+      /* position: sticky; */
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+
+
+
+    .content nav::before {
+      content: "";
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      left: 0;
+      bottom: -40px;
+      box-shadow: -20px -20px 0 var(--light);
+    }
+
+
+
+    .content nav a {
+      color: var(--dark);
+    }
+
+
+
+    .content nav .fa-bars {
+      cursor: pointer;
+      color: white;
+    }
+
+
+
+    .content nav .nav-link {
+      font-size: 16px;
+      transition: 0.3s ease;
+    }
+
+
+
+    .content nav .nav-link:hover {
+      color: var(--blue);
+    }
+
+
+
+    .content nav form {
+      max-width: 400px;
+      width: 400px;
+      margin-right: auto;
+    }
+
+
+
+    .content nav form .form-input {
+      display: flex;
+      align-items: center;
+      height: 36px;
+    }
+
+
+
+    .content nav form .form-input input {
+      flex-grow: 1;
+      padding: 0 16px;
+      height: 100%;
+      border: none;
+      background: var(--grey);
+      border-radius: 36px 0 0 36px;
+      outline: none;
+      width: 100%;
+      color: var(--dark);
+    }
+
+
+
+    .content nav form .form-input button {
+      width: 36px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--blue);
+      color: var(--light);
+      font-size: 18px;
+      border: none;
+      outline: none;
+      border-radius: 0 36px 36px 0;
+      cursor: pointer;
+    }
+
+
+
+    .content nav .profile img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+
+
+    .content main {
+      width: 100%;
+      padding: 36px 24px;
+      font-family: var(--poppins);
+      max-height: calc(100vh - 56px);
+      overflow-y: auto;
+    }
+
+
+
+    .content main .head-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+
+
+    .content main .head-title .left h1 {
+      font-size: 36px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--dark);
+    }
+
+
+
+    .content main .head-title .left .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+
+
+    .content main .head-title .left .breadcrumb i {
+      color: var(--dark);
+    }
+
+
+
+    .content main .head-title .left .breadcrumb li a {
+      color: var(--dark-grey);
+      pointer-events: none;
+    }
+
+
+
+    .content main .head-title .left .breadcrumb li a.active {
+      color: var(--blue);
+      pointer-events: unset;
+    }
+
+
+
+    .content main .box-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-top: 36px;
+    }
+
+
+
+    .content main .box-info li {
+      padding: 24px;
+      background: var(--light);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+
+
+    .content main .box-info li i {
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
+      font-size: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  
+
+
+
+    ::-webkit-scrollbar {
+      width: 0.5rem;
+      height: 0.5rem;
+    }
+
+
+
+    ::-webkit-scrollbar-track {
+      background: #d9d9d9;
+    }
+
+
+
+    ::-webkit-scrollbar-thumb {
+    
+      border-radius: 5rem;
+    }
+
+
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 200px;
+      }
+
+
+
+      .content {
+        width: calc(100% - 200px);
+        left: 200px;
+      }
+
+
+
+      .content nav .nav-link {
+        display: none;
+      }
+    }
+
+
+
+    @media (max-width: 576px) {
+      .content nav form .form-input input {
+        display: none;
+      }
+
+
+
+      .content nav form .form-input button {
+        width: auto;
+        height: auto;
+        background: transparent;
+        border-radius: none;
+        color: var(--dark);
+      }
+
+
+
+      .content nav form.show .form-input input {
+        display: block;
+        width: 100%;
+      }
+
+
+
+      .content nav form.show .form-input button {
+        width: 36px;
+        height: 36px;
+        border-radius: 0 36px 36px 0;
+        color: var(--light);
+        background: var(--red);
+      }
+
+
+
+      .content nav form.show~.notification,
+      .content nav form.show~.profile {
+        display: none;
+      }
+
+
+
+      .content main .table-data .head {
+        min-width: 420px;
+      }
+
+
+
+      .content main .table-data .order table {
+        min-width: 420px;
+      }
+
+
+
+      .content main .table-data .todo .todo-list {
+        min-width: 420px;
+      }
+    }
+
+
+
+    .profile-icon {
+      margin-left: auto; /* Push the profile icon to the right */
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #3c91e6; /* Background color */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white; /* Icon color */
+      font-size: 24px; /* Icon size */
+      border: 2px solid #fff; /* Optional border */
+    }
+
+
+
+    .user-info {
+      position: absolute;
+      right: 130px; /* Adjust the distance from the right edge */
+      color: #ffffff;
+    }
+
+
+    .wave-icon {
+      position: absolute;
+      right: 90px; /* Adjust the distance from the right edge */
+      font-size: 22px; /* Increase the size of the icon */
+      width: 30px; /* Optional, in case you want to set specific width */
+      height: 30px; /* Optional, in case you want to set specific height */
+
+
+
+    }
+
+
+    /* Style the logo */
+    .logos i {
+      position: absolute;
+      right: 360px; /* Adjust the distance from the right edge */
+      font-size: 22px; /* Increase the size of the icon */
+      width: 30px; /* Optional, in case you want to set specific width */
+      height: 30px; /* Optional, in case you want to set specific height */
+      top:33px;
+
+
+
+    }
+
+
+      li > .dropdown-menu{
+
+
+
+        display: none;
+
+
+
+      }
+
+
+
+      li.active > .dropdown-menu{
+
+
+
+  display: block;
+
+
+
+  }
+
+
+
+  li.active > .dropdown-menu > li , li.active > .dropdown-menu > li > a {
+    
+    padding: 0;
+    border-radius: 0;
+    
+    
+  }
+
+
+
+  .dropdown-item.text-center {
+      text-align: center;
+  }
+
+
+
+  li.active > .dropdown-menu > li > a {
+  display: inline-block;
+      text-align: center;
+
+
+
+      background: #0e3152 !important; 
+      color: white !important;
+      margin-top:17px;
+  }
+
+
+
+
+  /* Dropdown Menu Styles */
+  .dropdowns {
+      display: none; /* Hidden by default */
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: transparent;
+      border-radius: 5px;
+      z-index: 10;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+  }
+
+
+
+  .dropdown-items {
+      text-decoration: none;
+      color: #333;
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+  }
+
+
+
+  .dropdown-items:hover {
+      background-color: #f0f0f0;
+      color: #000;
+  }
+
+
+
+  .nav-items {
+      position: relative;
+      display: inline-block;
+  }
+
+
+
+  /* Icons */
+  .nav-links i,
+  .dropdown-items i {
+      margin-right: 10px;
+      font-size: 14px;
+  }
+
+
+
+  .nav-links .dropdown-arrow {
+      margin-left: auto;
+      transition: transform 0.3s ease; /* Smooth rotation */
+  }
+
+
+
+  .nav-links .dropdown-arrow.open {
+      transform: rotate(180deg); /* Rotate arrow when open */
+  }
+    
+    
+
+
+  </style>
+      {% block styles %}
+      {% endblock %}
+</head>
+
+
+<body>
+  <section class="sidebar">
+    <a href="#" class="logo">
+      <i class="fab fa-slack"></i>
+      <span class="text">Complain Tracker</span>
+    </a>
+    
+    <ul class="side-menu top" >
+      <li class=""  id="userdashboard">
+        <a href="{% url 'userdashboard' %}"  class="nav-link">
+          <i class="fab fa-microsoft"></i>
+          <span class="text">Dashboard</span>
+        </a>
+      </li>
+     
+
+
+      
+      <!-- Show this link only if we are not on the 'raisecomplaint' page -->
+   
+    <li class="{% if request.path == '/managecomplaints/' %}active{% endif %}">
+        <a href="{% url 'user' %}">
+            <i class="fas fa-list"></i>
+            <span>Manage Complaints</span>
+        </a>
+    </li>
+    
+
+
+      <li class="{% if request.path == '/raisecomplaint/' %}active{% endif %}" id="report">
+        <a href="{% url 'complain' %}" class="nav-link">
+            <i class="fas fa-exclamation-circle"></i>
+            <span class="text">Raise Complaint</span>
+        </a>
+    </li>
+   
+
+
+    <li class="nav-items" id="reports">
+      <a href="#" class="nav-links">
+          <i class="fas fa-clone"></i>
+          <span class="text">Reports</span>
+          <i class="fas fa-chevron-down dropdown-arrow"></i>
+      </a>
+
+
+
+      <ul class="dropdowns">
+        <li style="width: 127%;" class="{% if request.path == '/user_reports/' %}active{% endif %}">
+            <a href="{% url 'filtered_user_reports' %}" class="dropdown-items">
+                <i class="fas fa-chart-pie"></i>
+                Summary Reports
+            </a>
+        </li>
+        <li style="width: 127%;" class="{% if request.path == '/detaileduserreports' %}active{% endif %}">
+            <a href="{% url 'detailed_user_reports' %}" class="dropdown-items">
+                <i class="fas fa-list-alt"></i>
+                Detailed Reports
+            </a>
+        </li>
+    </ul>
+  </li>
+  </ul>
+
+
+  <ul class="side-menu" style="margin-top:109px">
+    <li>
+        <a href="{% url 'logout' %}" class="logout">
+          <i class="fas fa-right-from-bracket"></i>
+          <span class="text">Logout</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+
+  <section class="content">
+    <nav>
+      <i class="fas fa-bars menu-btn"></i>
+      <a href="#" class="nav-link"></a>
+
+
+
+      <input type="checkbox" hidden id="switch-mode" />
+      <label for="switch-mode" class="switch-mode"></label>
+
+
+
+      <!-- Display logged-in username -->
+      <div class="user-info">
+        Logged in as: <span>{{ user_name }}</span>
+      </div>
+
+
+      <!-- Waving hand icon -->
+      <div class="wave-icon">
+        👋
+      </div>
+
+
+      <!-- Profile icon -->
+      <div class="profile-icon">
+        <i class="fas fa-user"></i>
+      </div>
+
+
+    </nav>
+
+
+    <main>
+        
+    </main>
+    {% block content %}
+      
+    {% endblock %}
+  </section>
+
+
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+
+    <script>
+  
+      document.addEventListener('DOMContentLoaded', function () {
+        let reportItem = document.getElementById('reports');
+        let dropdownMenu = reportItem.querySelector('.dropdowns');
+        let dropdownArrow = reportItem.querySelector('.dropdown-arrow');
+        let dropdownLinks = dropdownMenu.querySelectorAll('.dropdown-items');
+    
+    
+        // Function to check and activate the current page link
+        function activateCurrentPage() {
+            let currentURL = window.location.href;
+            dropdownLinks.forEach(link => {
+                if (currentURL.includes(link.href)) {
+                    link.classList.add('active');
+                    dropdownMenu.style.display = 'block'; // Ensure the dropdown stays open
+                    dropdownArrow.classList.add('open');  // Keep the arrow rotated
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+    
+    
+        // Call this on page load to activate the correct menu item
+        activateCurrentPage();
+    
+    
+        // Dropdown toggle logic for "Reports"
+        reportItem.addEventListener('click', function (e) {
+            if (e.target.classList.contains('dropdown-items') || e.target.closest('.dropdown-items')) {
+                // Let the default behavior for dropdown links happen (navigate)
+                return;
+            }
+    
+    
+            e.preventDefault(); // Prevent default link behavior for "Reports"
+    
+    
+            let isOpen = dropdownMenu.style.display === 'block';
+    
+    
+            if (isOpen) {
+                dropdownMenu.style.display = 'none';
+            } else {
+                dropdownMenu.style.display = 'block';
+            }
+    
+    
+            dropdownArrow.classList.toggle('open', !isOpen);
+        });
+    
+    
+        // Close the dropdown if clicking outside
+        document.addEventListener('click', function (e) {
+            if (!reportItem.contains(e.target)) {
+                dropdownMenu.style.display = 'none';
+                dropdownArrow.classList.remove('open');
+            }
+        });
+    });
+
+
+let searchFrom = document.querySelector(".content nav form");
+    let searchBtn = document.querySelector(".search-btn");
+    let searchIcon = document.querySelector(".search-icon");
+
+
+
+// searchBtn.addEventListener("click", (e) => {
+//   if (window.innerWidth < 576) {
+//     e.preventDefault();
+//     searchFrom.classList.toggle("show"); // Toggle the visibility of the search form
+
+
+//     // Change the icon based on the visibility of the search form
+//     if (searchFrom.classList.contains("show")) {
+//       searchIcon.classList.replace("fa-search", "fa-times");
+//     } else {
+//       searchIcon.classList.replace("fa-times", "fa-search");
+//     }
+//   }
+// });
+
+
+    let menuBar = document.querySelector(".menu-btn");
+    let sideBar = document.querySelector(".sidebar");
+    menuBar.addEventListener("click", () => {
+      sideBar.classList.toggle("hide");
+    });
+
+
+    let switchMode = document.getElementById("switch-mode");
+    switchMode.addEventListener("change", (e) => {
+      if (e.target.checked) {
+        document.body.classList.add("dark");
+      } else {
+        document.body.classList.remove("dark");
+      }
+    });
+ 
+    // searchBtn.addEventListener("click", (e) => {
+    //   if (window.innerWidth < 576) {
+    //     e.preventDefault();
+    //     searchFrom.classList.toggle("show");
+    //     if (searchFrom.classList.contains("show")) {
+    //       searchIcon.classList.replace("fa-search", "fa-times");
+    //     } else {
+    //       searchIcon.classList.replace("fa-times", "fa-search");
+    //     }
+    //   }
+    // });
+
+
+    // window.addEventListener("resize", () => {
+    //   if (window.innerWidth > 576) {
+    //     searchIcon.classList.replace("fa-times", "fa-search");
+    //     searchFrom.classList.remove("show");
+    //   }
+    //   if (window.innerWidth < 768) {
+    //     sideBar.classList.add("hide");
+    //   }
+    // });
+
+
+    // if (window.innerWidth < 768) {
+    //   sideBar.classList.add("hide");
+    // }
+
+
+// let pathname = window.location.pathname; 
+
+
+// if(pathname=="/resolver/"){
+//     // console.log("yes")
+
+
+//     let element = document.querySelector('#resolver');
+//     let idValue = element.id;
+//     if(idValue=="resolver"){
+//         element.classList.add('active');
+//     }
+
+
+// }else{
+//     console.log("no")
+// }
+
+
+// if(pathname=="/user/"){
+//     // console.log("yes")
+
+
+//     let element = document.querySelector('#user');
+//     let idValue = element.id; 
+//     if(idValue=="user"){
+//         element.classList.add('active');
+//     }
+
+
+
+// }else{
+//     console.log("no")
+// }
+
+
+// if(pathname=="/superadmin/"){
+//     // console.log("yes")
+
+
+//     let element = document.querySelector('#superadmin');
+//     let idValue = element.id; // Gets the id value
+//     if(idValue=="superadmin"){
+//         element.classList.add('active');
+//     }else{
+//         element.classList.add('inactive');
+//     }
+
+
+
+// }else{
+//     console.log("no")
+// }
+
+
+let pathname = window.location.pathname; 
+
+
+if(pathname=="/userdashboard/"){
+    // console.log("yes")
+
+
+    let element = document.querySelector('#userdashboard');
+    let idValue = element.id;
+    if(idValue=="userdashboard"){
+        element.classList.add('active');
+    }
+
+
+
+}else{
+    console.log("no")
+}
+
+
+if(pathname=="/allcomplaints/"){
+  // console.log("yes")
+
+
+  let element = document.querySelector('#user');
+  let idValue = element.id;
+  if(idValue=="user"){
+      element.classList.add('active');
+  }
+
+
+
+}else{
+  console.log("no")
+}
+
+
+  </script>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+  <!-- DataTables JS -->
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+     {% block scripts %}
+      
+     {% endblock %}
+</body>
+
+
+</html>
+
+
+
+

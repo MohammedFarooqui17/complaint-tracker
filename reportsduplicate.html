@@ -1,0 +1,165 @@
+{% extends "master.html" %}
+ 
+{% block styles %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .report-container {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 50px;
+            margin-top: -100px;
+        }
+ 
+        h1 {
+            font-weight: bold;
+            font-size: 35px;
+            margin: 50px 0;
+            margin-bottom: 20px;
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        }
+ 
+        .filter-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80%;
+        }
+ 
+        .filter-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            width: 100%;
+            margin-bottom: 60px;
+        }
+ 
+        .filter-item {
+            flex: 1 1 200px;
+            margin: 10px;
+        }
+ 
+        label {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+ 
+        input[type="date"], select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 1px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+ 
+        input[type="date"]:focus, select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+ 
+        input[type="date"]:hover, select:hover {
+            border-color: #007bff;
+        }
+ 
+        .icon {
+            font-size: 150px;
+            color: #0e3152;
+            margin: 20px 0;
+        }
+ 
+        .download-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #0e3152;
+            border: none;
+            border-radius: 1px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+ 
+        .download-button:hover {
+            background-color: #3165c6;
+        }
+    </style>
+{% endblock %}
+ 
+{% block content %}
+<div class="report-container">
+    <h1>Reports</h1>
+    <form class="filter-form" action="{% url 'reports' %}" method="get">
+        <!-- Date Filters -->
+        <div class="filter-row">
+            <div class="filter-item">
+                <label for="from_date">From:</label>
+                <input type="date" id="from_date" name="fromdate" value="{{ from_date }}" required>
+            </div>
+            <div class="filter-item">
+                <label for="to_date">To:</label>
+                <input type="date" id="to_date" name="todate" value="{{ to_date }}" required>
+            </div>
+        </div>
+ 
+        <!-- Dropdown Filters -->
+        <div class="filter-row">
+            <div class="filter-item">
+                <label for="status">Status:</label>
+                <select id="status" name="status">
+                    <option value="">Select Status</option>
+                    {% for status_item in statuses %}
+                        <option value="{{ status_item }}" {% if status_item == status %}selected{% endif %}>{{ status_item }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="location">Location:</label>
+                <select id="location" name="location">
+                    <option value="">Select Location</option>
+                    {% for location in distinct_locations %}
+                        <option value="{{ location }}" {% if location == location_type %}selected{% endif %}>{{ location }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="department">Department:</label>
+                <select id="department" name="department">
+                    <option value="">Select Department</option>
+                    {% for dept in distinct_departments %}
+                        <option value="{{ dept }}" {% if dept == department %}selected{% endif %}>{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="complaint_type">Complaint Type:</label>
+                <select id="complaint_type" name="complaint_type">
+                    <option value="">--Select Complaint Type</option>
+                    {% for complaint in distinct_complaint_types %}
+                        <option value="{{ complaint }}" {% if complaint == complaint_type %}selected{% endif %}>{{ complaint }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+ 
+        <!-- Icon -->
+        <i class="fas fa-file-alt icon"></i>
+ 
+        <!-- Submit Button -->
+        <button type="submit" class="download-button">Download Reports</button>
+ 
+        <!-- Hidden Input -->
+        <input type="hidden" name="download" value="true">
+    </form>
+</div>
+{% endblock %}
+ 
+{% block scripts %}
+    <!-- Additional scripts if required -->
+{% endblock %}

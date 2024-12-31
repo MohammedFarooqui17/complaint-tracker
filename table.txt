@@ -1,0 +1,58 @@
+CREATE TABLE user (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,                 
+    role ENUM('superadmin', 'admin', 'user') NOT NULL,  
+    department VARCHAR(100),                     
+    location VARCHAR(100),                                                   
+    issue_raise_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
+    status ENUM('done', 'wip', 'overdue') NOT NULL,  
+    tat INT CHECK (tat >= 0),                    
+    due_date TIMESTAMP
+    Emp_code
+    Email
+    Emp_Level(L0,L1,L2)                        
+);
+
+ id , name , role   , department , location  , issue_raise_date , 
+ status , tat , due_date  , emp_code ,  email , emp_level , password
+
+
+CREATE TABLE complaint (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(30)
+    user_id INT NOT NULL,                         
+    resolved_by_id INT,                          
+    department VARCHAR(100) NOT NULL,           
+    location VARCHAR(100) NOT NULL,                            
+    complaint_type VARCHAR(100) NOT NULL,       
+    description VARCHAR(350) NOT NULL,          
+    issue_raise_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    complain_status ENUM('done', 'wip', 'overdue') NOT NULL, 
+    due_date TIMESTAMP NOT NULL,                
+    tat INT CHECK (tat >= 0) NOT NULL,             
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
+    FOREIGN KEY (user_id) REFERENCES user(id),  
+ 
+);
+ id  , user_id , resolved_by_name , department , location 
+ complaint_type , description, issue_raise_date  ,complain_status ,
+  due_date ,tat ,updated_at   
+
+
+CREATE TABLE complaint (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,                          -- User making the complaint
+    name VARCHAR(30),                             -- Name of the person making the complaint
+    resolved_by_name VARCHAR(30),                           -- User resolving the complaint
+    department VARCHAR(100) NOT NULL,            -- Department related to the complaint
+    location VARCHAR(100) NOT NULL,              -- Location of the issue
+    complaint_type VARCHAR(100) NOT NULL,        -- Type of complaint
+    description VARCHAR(350) NOT NULL,           -- Detailed description of the complaint
+    issue_raise_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Date and time complaint was raised
+    complain_status ENUM('done', 'wip', 'overdue') NOT NULL, -- Current status of the complaint
+    due_date TIMESTAMP NOT NULL,                  -- Deadline for resolution
+    tat INT CHECK (tat >= 0) NOT NULL,           -- Turnaround time
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Last update timestamp
+    FOREIGN KEY (user_id) REFERENCES user(id),   -- Foreign key reference to user
+    FOREIGN KEY (resolved_by_id) REFERENCES user(id) -- Foreign key reference for resolver
+);

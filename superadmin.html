@@ -1,0 +1,278 @@
+{% extends "master.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    .table-container {
+        max-width: 1350px; /* Width for the tables */
+        margin: auto; /* Center the tables */
+        margin-bottom: 40px; /* Space between tables */
+        border-radius: 5px; /* Rounded corners */
+        padding: 20px; /* Inner spacing */
+        height: auto;
+        min-height: 380px;
+        box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        background-color: transparent; /* White background */
+    }
+
+    
+    .scrollable-table {
+        max-height: 300px; /* Set a fixed height for scrolling */
+        margin-bottom: 20px; /* Space between table and pagination */
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+    th, td {
+        padding: 10px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f4f4f4; /* Light gray for header */
+        color: #333; /* Dark text for better readability */
+        font-weight: bold;
+    }
+
+
+    .header-container {
+        display: flex;
+        justify-content: space-between; /* Space between elements */
+        align-items: center;
+        margin-bottom: 20px;
+        margin-top: 20px;
+    }
+    #search, #complaintSearch {
+        width: 250px; /* Width for the search bars */
+        height: 40px; /* Height for the search bars */
+        padding: 10px;
+        border: 2px solid #0e3457;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+    .add-button, .view-button, .pagination button {
+        background-color: #0e3457; /* Sky blue */
+        color: white; /* Text color */
+        padding: 7px 10px; /* Padding */
+        border: none; /* No border */
+        border-radius: 4px; /* Rounded corners */
+        cursor: pointer; /* Pointer cursor on hover */
+        margin-left: 5px; /* Space between buttons */
+    }
+    .add-button:hover, .view-button:hover, .pagination button:hover {
+        background-color: #0e3457; /* Darker on hover */
+    }
+    .pagination {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-top: 10px; /* Space above pagination */
+    }
+    .pagination button:disabled {
+        background-color: #0e3457;
+        cursor: not-allowed;
+    }
+    .action-icons {
+        display: flex;
+        gap: 10px; /* Space between icons */
+    }
+    .action-icons i {
+        cursor: pointer;
+        color: #0e3457; /* Icon color */
+    }
+    .action-icons i:hover {
+        color: #0e3457; /* Darker on hover */
+    }
+    /* h2 {
+        margin-bottom: 20px;
+        text-align: left; /* Align the title to the left 
+    } */
+    .status-pending {
+        color: #FF8C00; /* Orange for Pending */
+        font-weight: bold;
+    }
+    
+    .status-progress {
+        color: #70610a; /* Golden Yellow for Work in Progress */
+        font-weight: bold;
+    }
+    
+    .status-overdue {
+        color: #FF4500; /* Red for Overdue */
+        font-weight: bold;
+    }
+    
+    .status-resolved {
+        color: #32CD32; /* Green for Resolved */
+        font-weight: bold;
+    }
+    th {
+        background-color: #f4f4f4;
+        padding-right: 30px; /* Add space to the right for the sorting icon */
+        position: relative; /* To position the icon inside the th */
+      }
+      
+      
+      .sort-indicator {
+        position: absolute;
+        right: 10px; /* Space from the right edge */
+        top: 50%;
+        transform: translateY(-50%); /* Vertically center the icon */
+        cursor: pointer;
+        display: inline-block; /* Ensure icon aligns properly with text */
+      }
+      
+      
+      th span {
+        margin-right: 5px; /* Add some space between the heading text and icon */
+       
+      }
+      h2{
+        margin-left: 50px;
+        margin-bottom: 50px;
+        font-size: 30px;
+      }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">All Users</h2>
+<div class="table-container">
+    <div class="header-container">
+        <!-- <h2>All Users</h2> -->
+        <div>
+            <a href="{% url 'adduser' %}" class="add-button">Add</a>
+        </div>
+    </div>
+
+    <div class="scrollable-table">
+        <table id="userRecordsTable" data-sort-direction="asc" class="display">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Location</th>
+                    <th>Department</th>
+                    <th>Created At</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.1 }}</td>
+                    <td>{{ user.12 }}</td>
+                    <td>{{ user.5 }}</td>
+                    <td>{{ user.4 }}</td>
+                    <td>{{ user.6 }}</td>
+                    <td class="action-icons">
+                        <a href="{% url 'edit' user.0 %}" class="fas fa-edit"></a>
+                        <a href="{% url 'delete_user' user.0 %}" class="fas fa-trash-alt" style="color:red;" onclick="return confirm('Are you sure you want to delete this user?');"></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+
+
+
+{% endblock %}
+
+{% block script %}
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
+<!-- DataTables Buttons CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+
+<!-- DataTables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+
+<!-- JSZip for Excel export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<!-- PDFMake for PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Initialize DataTables for userRecordsTable
+        $('#userRecordsTable').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            responsive: true,
+            lengthMenu: [5, 10, 25, 50], // Options for records per page
+            lengthChange: true, // Enable "Records per page" dropdown
+            columnDefs: [
+                { orderable: false, targets: -1 }
+            ],
+            language: {
+                search: "Search Users:",
+                lengthMenu: "Display _MENU_ records per page",
+                zeroRecords: "No users found",
+                info: "Showing _START_ to _END_ of _TOTAL_ users",
+                infoEmpty: "No records available",
+                paginate: {
+                    previous: "Previous",
+                    next: "Next"
+                }
+            },
+
+            initComplete: function() {
+                // Apply custom CSS styles to move the search box label and input up
+                $('#userRecordsTable_filter label').css({
+                    'position': 'relative',
+                    'top': '-8px',  // Adjust the value as needed to move the search box up
+                    'left': '0'
+                });
+                $('#userRecordsTable_filter input').css({
+                    'position': 'relative',
+                    'top': '-3px'  // Adjust the value as needed to move the search box up
+                });
+            }
+        });
+    
+        // Initialize DataTables for complaintsTable
+        $('#complaintsTable').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            responsive: true,
+            lengthMenu: [5, 10, 25, 50], // Options for records per page
+            lengthChange: true, // Enable "Records per page" dropdown
+            columnDefs: [
+                { orderable: false, targets: -1 }
+            ],
+            language: {
+                search: "Search Complaints:",
+                lengthMenu: "Display _MENU_ records per page",
+                zeroRecords: "No complaints found",
+                info: "Showing _START_ to _END_ of _TOTAL_ complaints",
+                infoEmpty: "No records available",
+                paginate: {
+                    previous: "Previous",
+                    next: "Next"
+                }
+            },
+
+            
+        });
+    });
+</script>
+{% endblock %}

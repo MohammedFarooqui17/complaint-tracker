@@ -1,0 +1,580 @@
+{% extends "master.html" %}
+
+{% block styles %}
+<style>
+    .form-container {
+        max-width: 1200px; 
+        margin: auto;
+        padding: 30px; 
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .form-row {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        width: 32%;
+    }
+
+    .form-group label {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .form-group input {
+        font-size: 1.1em;
+        padding: 10px;
+        height: 50px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .form-buttons {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .btn {
+        font-size: 1.1em;
+        padding: 8px 16px;
+        width: auto;
+        background-color: #0e3152;
+        border-radius: 4px;
+        color: white;
+    }
+  
+
+    .table-container {
+        max-width: 1200px;
+        margin: auto;
+        margin-bottom: 40px;
+        border-radius: 5px;
+        padding: 20px;
+        box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+        background-color: transparent;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f4f4f4;
+        color: #333;
+        font-weight: bold;
+    }
+
+    .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    #officeHoursTable {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    #officeHoursTable th, #officeHoursTable td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    #officeHoursTable th {
+        background-color:rgb(245, 242, 242);
+        color: inherit;
+        cursor: pointer;
+    }
+
+    #officeHoursTable tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .action-icons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-warning {
+        background-color: #0e3457;
+        color: white;
+        border-radius: 4px;
+    }
+    .btn {
+        padding: 8px 13px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .btn-danger {
+        background-color: #f44336;
+        color: white;
+        border-radius: 4px;
+    }
+
+    .no-data {
+        text-align: center;
+        font-style: italic;
+        color: #888;
+    }
+
+    @media screen and (max-width: 768px) {
+        .form-group {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .form-buttons {
+            flex-direction: column;
+        }
+
+        #officeHoursTable th, #officeHoursTable td {
+            padding: 8px;
+        }
+
+        .action-icons {
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .btn {
+            font-size: 12px;
+        }
+    }
+
+    div.dataTables_filter {
+        margin-top: -10px; 
+    }
+
+    div.dataTables_filter label {
+        margin-top: -5px; 
+    }
+
+    h2 {
+        margin-left: 50px;
+        margin-bottom: 33px;
+        font-size: 30px;
+        margin-top: -27px;
+    }
+
+    /* Dropdown styles */
+    .input-wrapper {
+        position: relative;
+    }
+
+    .dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: white;
+        border: 1px solid #ccc;
+        z-index: 100;
+    }
+
+    .dropdown ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .dropdown li {
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+
+    .dropdown li.selected {
+        background-color: #ddd;
+    }
+
+    .dropdown li:hover {
+        background-color: #f0f0f0;
+    }
+
+
+
+    .form-group {
+        position: relative;
+    }
+
+    .placeholder {
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        font-size: 20px;
+        transform: translateY(-50%);
+        color: #837a7a;
+        margin-top: 5px;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .form-control:focus + .placeholder {
+        display: none;  /* Hide placeholder on focus */
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">Manage Office Hours</h2>
+<div class="form-container">
+    <form id="officeHoursForm" method="post">
+        {% csrf_token %}
+        
+        <!-- Form Row: Non-Working Days, Office Start Time, and Office End Time -->
+        <div class="form-row">
+            <div class="form-group" style="margin-top: 30px;">
+                <label for="non_working_days"></label>
+                <div class="input-wrapper">
+                    <input type="text" id="non_working_days_input" class="form-control" readonly placeholder="Select non-working days" style="width: 350px;" />
+                    <div class="dropdown">
+                        <ul id="days_dropdown">
+                            <li data-day="monday">Monday</li>
+                            <li data-day="tuesday">Tuesday</li>
+                            <li data-day="wednesday">Wednesday</li>
+                            <li data-day="thursday">Thursday</li>
+                            <li data-day="friday">Friday</li>
+                            <li data-day="saturday">Saturday</li>
+                            <li data-day="sunday">Sunday</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" style="margin-top: 30px;">
+                <label for="work_start_time"></label>
+                <input type="time" id="work_start_time" name="work_start_time" class="form-control" placeholder="Office Start Time" required style="width: 350px;">
+                <span class="placeholder" id="start-time-placeholder">Start Time</span>
+            </div>
+            <div class="form-group" style="margin-top: 30px;">
+                <label for="work_end_time"></label>
+                <input type="time" id="work_end_time" name="work_end_time" class="form-control" placeholder="Office End Time" required style="width: 350px;">
+                <span class="placeholder" id="end-time-placeholder">End Time</span>
+            </div>
+        </div>
+    
+        <div class="form-buttons">
+            <button type="submit" class="btn" style="margin-left: 30px; width: 130px;">Add</button>
+        </div>
+    </form>
+    
+</div>
+
+<div class="table-container">
+    <div class="header-container"></div>
+
+    <div class="scrollable-table">
+        <table id="officeHoursTable">
+            <thead>
+                <tr>
+                    <th>Non-Working Days</th>
+                    <th>Office Start Time</th>
+                    <th>Office End Time</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if office_timings_data %}
+                    {% for office_timing in office_timings_data %}
+                    <tr id="office-hour-{{ office_timing.id }}">
+                        <td>{{ office_timing.non_working_days }}</td>
+                        <td>{{ office_timing.work_start_time }}</td>
+                        <td>{{ office_timing.work_end_time }}</td>
+                        <td class="action-icons">
+                            <a href="javascript:void(0);" class="btn btn-warning edit-btn" data-id="{{ office_timing.id }}" data-non-working-days="{{ office_timing.non_working_days }}" data-start-time="{{ office_timing.work_start_time }}" data-end-time="{{ office_timing.work_end_time }}">Edit</a>
+                            <a href="javascript:void(0);" class="btn btn-danger delete-btn" data-id="{{ office_timing.id }}">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="no-data">No office hours available.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ 
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+ 
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+ 
+<!-- DataTables Buttons CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+ 
+<!-- DataTables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+ 
+<!-- JSZip for Excel export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+ 
+<!-- PDFMake for PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+ 
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable
+        $('#officeHoursTable').DataTable({
+            "paging": true,           // Enable pagination
+            "lengthChange": true,     // Enable records per page selection
+            "searching": true,        // Enable search functionality
+            "ordering": true,         // Enable column sorting
+            "info": true,             // Show information about the current page
+            "autoWidth": false,       // Disable automatic column width adjustment
+            "pageLength": 5,         // Set default records per page to 10
+            "lengthMenu": [3,5, 10, 25, 50, 100], // Set the records per page options
+        });
+    });
+</script>
+
+<script>
+
+const startTimeInput = document.getElementById('work_start_time');
+    const endTimeInput = document.getElementById('work_end_time');
+    
+    // Function to toggle placeholder visibility
+    function togglePlaceholder(input, placeholderId) {
+        const placeholder = document.getElementById(placeholderId);
+        if (input.value) {
+            placeholder.style.display = 'none';
+        } else {
+            placeholder.style.display = 'block';
+        }
+    }
+
+    // Initial placeholder visibility
+    togglePlaceholder(startTimeInput, 'start-time-placeholder');
+    togglePlaceholder(endTimeInput, 'end-time-placeholder');
+
+    // On focus and blur to hide or show placeholder
+    startTimeInput.addEventListener('focus', function() {
+        document.getElementById('start-time-placeholder').style.display = 'none';
+    });
+    startTimeInput.addEventListener('blur', function() {
+        togglePlaceholder(startTimeInput, 'start-time-placeholder');
+    });
+
+    endTimeInput.addEventListener('focus', function() {
+        document.getElementById('end-time-placeholder').style.display = 'none';
+    });
+    endTimeInput.addEventListener('blur', function() {
+        togglePlaceholder(endTimeInput, 'end-time-placeholder');
+    });
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const inputElement = document.getElementById("non_working_days_input");
+    const dropdown = document.querySelector(".dropdown");
+    const daysDropdown = document.getElementById("days_dropdown");
+    const selectedDays = new Set();
+
+    // Track the currently editing office timing ID
+    let editingId = null;
+
+    // Toggle dropdown visibility when input box is clicked
+    inputElement.addEventListener("click", function () {
+        dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+    });
+
+    // Handle selection of days from the dropdown
+    daysDropdown.addEventListener("click", function (e) {
+        const dayItem = e.target;
+        if (dayItem.tagName.toLowerCase() === "li") {
+            const day = dayItem.textContent.trim();
+            
+            // Toggle the selected state of the day
+            if (selectedDays.has(day)) {
+                selectedDays.delete(day);
+                dayItem.classList.remove("selected");
+            } else {
+                selectedDays.add(day);
+                dayItem.classList.add("selected");
+            }
+
+            // Update the input with the selected days
+            updateInput();
+        }
+    });
+
+    // Update the input value with selected days (comma-separated)
+    function updateInput() {
+        inputElement.value = Array.from(selectedDays).join(", ");
+    }
+
+    // Close the dropdown if user clicks outside of it
+    document.addEventListener('click', function (e) {
+        if (!inputElement.contains(e.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
+
+    // Handle form submission for adding or updating office hours
+    const form = document.getElementById("officeHoursForm");
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();  // Prevent page refresh
+        
+        const nonWorkingDays = inputElement.value;
+        const workStartTime = document.getElementById('work_start_time').value;
+        const workEndTime = document.getElementById('work_end_time').value;
+
+        const data = {
+            non_working_days: nonWorkingDays,
+            work_start_time: workStartTime,
+            work_end_time: workEndTime
+        };
+
+        const method = editingId ? 'PUT' : 'POST'; // Use PUT for updates, POST for adding new entries
+        const url = editingId ? `/edit_office_timing/${editingId}/` : "{% url 'manage_office_timings' %}";
+
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            
+            if (data.success) {
+
+                console.log(data.office_timing.non_working_days);
+                // If editing, update the table row without refreshing the page
+                if (editingId) {
+                    const row = document.getElementById(`office-hour-${editingId}`);
+                    row.querySelector('td:nth-child(1)').textContent = data.office_timing.non_working_days;
+                    row.querySelector('td:nth-child(2)').textContent = data.office_timing.work_start_time;
+                    row.querySelector('td:nth-child(3)').textContent = data.office_timing.work_end_time;
+                } else {
+                    // If adding new, insert the new row dynamically
+                    const newRow = `
+                        <tr id="office-hour-${data.office_timing.id}">
+                            <td>${data.office_timing.non_working_days}</td>
+                            <td>${data.office_timing.work_start_time}</td>
+                            <td>${data.office_timing.work_end_time}</td>
+                            <td class="action-icons">
+                                <a href="javascript:void(0);" class="btn btn-warning edit-btn" data-id="${data.office_timing.id}" data-non-working-days="${data.office_timing.non_working_days}" data-start-time="${data.office_timing.work_start_time}" data-end-time="${data.office_timing.work_end_time}">Edit</a>
+                                <a href="javascript:void(0);" class="btn btn-danger delete-btn" data-id="${data.office_timing.id}">Delete</a>
+                            </td>
+                        </tr>`;
+                    document.querySelector("table tbody").insertAdjacentHTML('beforeend', newRow);
+                }
+
+                // Reset the form after submission
+                resetForm();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    // Event delegation for dynamically added edit button
+    document.querySelector("table tbody").addEventListener("click", function (e) {
+        if (e.target && e.target.classList.contains('edit-btn')) {
+            const button = e.target;
+            editingId = button.getAttribute('data-id');
+            const nonWorkingDays = button.getAttribute('data-non-working-days');
+            const startTime = button.getAttribute('data-start-time');
+            const endTime = button.getAttribute('data-end-time');
+
+            // Set the values in the form for editing
+            inputElement.value = nonWorkingDays;
+            document.getElementById('work_start_time').value = startTime;
+            document.getElementById('work_end_time').value = endTime;
+
+            // Set selected days (assuming you're using the dropdown to display them)
+            selectedDays.clear();
+            nonWorkingDays.split(', ').forEach(day => {
+                selectedDays.add(day);
+                const dayItem = Array.from(daysDropdown.children).find(item => item.textContent.trim() === day);
+                if (dayItem) {
+                    dayItem.classList.add("selected");
+                }
+            });
+            updateInput();
+        }
+    });
+
+    // Event delegation for dynamically added delete button
+    document.querySelector("table tbody").addEventListener("click", function (e) {
+        if (e.target && e.target.classList.contains('delete-btn')) {
+            const button = e.target;
+            const id = button.getAttribute('data-id');
+            if (confirm("Are you sure you want to delete this office timing?")) {
+                fetch(`/delete_office_timing/${id}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Office timing deleted successfully!");
+                        // Remove the row from the table
+                        const row = document.getElementById(`office-hour-${id}`);
+                        if (row) {
+                            row.remove();
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+    });
+
+    // Reset form and editing state
+    function resetForm() {
+        editingId = null;
+        document.getElementById('work_start_time').value = '';
+        document.getElementById('work_end_time').value = '';
+        inputElement.value = '';
+        selectedDays.clear();
+        dropdown.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}
+

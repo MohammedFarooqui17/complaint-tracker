@@ -1,0 +1,952 @@
+{% extends "sidebarR.html" %}
+
+{% block styles %}
+<style>
+  /* General styles */
+  .head-title {
+    margin-bottom: 20px;
+   
+  }
+
+
+
+  .head-title h1 {
+    font-weight: bold;
+    font-size: 35px;
+    margin: 0 0 25px 20px;
+    color: rgb(23, 23, 88);
+  }
+
+
+
+  .table-container {
+    max-width: 1400px; /* Width for the tables */
+    margin: auto; /* Center the tables */
+    margin-bottom: 40px; /* Space between tables */
+    border-radius: 5px; /* Rounded corners */
+    padding: 20px; /* Inner spacing */
+    height: auto;
+    min-height: 380px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    background-color: transparent; /* White background */
+    margin-top: 20px;
+}
+
+
+  
+  .card-container1 {
+    display: flex;
+    gap: 20px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+    margin-left: 20px;
+  }
+
+
+
+
+
+
+  .card:hover {
+    transform: translateY(-3px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+
+
+  .total-complaints { background-color: #2f3d4c; }
+  .in-progress { background-color: #967c2e; }
+  .done { background-color: #011004; }
+  .overdue { background-color: #310408; }
+  .resolveoverdue { background-color: #b34b0f; }
+
+
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+
+
+
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+
+
+
+
+th {
+  background-color: white; /* Light gray for header */
+  color: #333; /* Dark text for better readability */
+  font-weight: bold;
+}
+
+
+
+
+
+  tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+
+
+
+  h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 30px;
+  }
+
+
+
+  /* Pagination */
+  .pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+
+
+  .pagination button {
+    padding: 8px 16px;
+    border: none;
+    background-color: #0e3152;
+    color: white;
+    cursor: pointer;
+    margin-left: 5px;
+  }
+
+
+
+  .pagination button:disabled {
+    background-color: #0e3152;
+    cursor: not-allowed;
+  }
+
+
+
+  #pageInfo {
+    margin: 0 10px;
+  }
+
+
+
+ /* Header styling */
+ .header-container {
+  display: flex;
+  justify-content: space-between; /* Space between elements */
+  align-items: center;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+
+
+  .title-filter-container h2 {
+    margin: 0; /* Remove default margin */
+  }
+
+
+
+  .filter-form {
+    display: flex;
+    gap: 10px; /* Space between inputs and button */
+    align-items: center;
+  }
+
+
+
+  .filter-form input[type="date"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+
+
+  .filter-form button {
+    padding: 8px 16px;
+    border: none;
+    background-color: #0e3152;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+
+
+  .filter-form button:hover {
+    background-color: #0e3152;
+  }
+
+
+
+  form {
+    display: flex;
+    justify-content: space-between; /* Space between title and input fields */
+    align-items: center; /* Vertically center the elements */
+    margin-bottom: 20px; /* Space below the form */
+}
+
+
+
+/* Styling for input fields */
+input[type="date"] {
+    padding: 10px 15px; /* Add padding for more space inside the input */
+    font-size: 16px; /* Increase font size for better readability */
+    border: 2px solid #ddd; /* Light border color */
+    border-radius: 5px; /* Rounded corners */
+    width: 200px; /* Increased width */
+    transition: border-color 0.3s ease; /* Smooth transition on hover/focus */
+}
+
+
+
+/* Focus state for input fields */
+input[type="date"]:focus {
+    border-color: #0e3152; /* Blue border color on focus */
+    outline: none; /* Remove default outline */
+}
+
+
+
+/* Styling for the filter button */
+button[type="submit"] {
+    padding: 10px 20px; /* Add padding for better button size */
+    background-color: #0e3152; /* Button background color */
+    color: white; /* Text color */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Increase font size for readability */
+    cursor: pointer; /* Change cursor to pointer */
+    transition: background-color 0.3s ease; /* Smooth transition on hover */
+}
+
+
+
+/* Hover effect for the filter button */
+button[type="submit"]:hover {
+    background-color: #0e3152; /* Darker blue on hover */
+}
+
+
+/* Example color coding for statuses */
+.status-pending {
+  color: #FF8C00; /* Orange for Pending */
+  font-weight: bold;
+}
+
+
+.status-progress {
+  color: #8a7605d0; /* Golden Yellow for Work in Progress */
+  font-weight: bold;
+}
+
+
+.status-overdue {
+  color: #FF4500; /* Red for Overdue */
+  font-weight: bold;
+}
+
+
+.status-resolved {
+  color: #32CD32; /* Green for Resolved */
+  font-weight: bold;
+}
+
+
+.sort-indicator {
+  position: absolute;
+  right: 10px; /* Space from the right edge */
+  top: 50%;
+  transform: translateY(-50%); /* Vertically center the icon */
+  cursor: pointer;
+  display: inline-block; /* Ensure icon aligns properly with text */
+}
+
+
+
+th span {
+  margin-right: 5px; /* Add some space between the heading text and icon */
+ 
+}
+
+
+
+.main {
+        padding: 10px;
+        background: transparent;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 10px;
+        min-height: 10vh;
+    }
+
+
+    .card {
+        background-color: transparent;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+    .card h2 {
+        font-size: 14px;
+        color: #000000;
+        margin-bottom: 10px;
+        font-weight: 20px;
+        font-size: medium;
+    }
+
+
+    .card canvas {
+        max-width: 250px;
+        max-height: 350px;
+    }
+
+
+    .large-card-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); 
+        margin-top: 20px;
+    }
+
+
+   
+    .large-card {
+        width: 645px;  
+        height: 400px; 
+        margin-bottom: 20px; 
+    }
+
+
+    .large-card canvas{
+      max-width: 550px;
+      max-height: 650px;
+    }
+
+
+   
+    @media (max-width: 1200px) {
+        .main {
+            grid-template-columns: repeat(2, 1fr); 
+        }
+    }
+
+
+    @media (max-width: 768px) {
+    .main {
+        grid-template-columns: 1fr;
+        gap: 10px; /* Ensure spacing adapts */
+        padding: 10px; /* Adjust padding */
+    }
+
+
+    .large-card-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.view-button {
+  display: inline-block;
+  padding: 8px 15px;                /* Adds padding for better click area */
+  font-size: 16px;                   /* Slightly larger font for readability */
+  font-weight: 600;                  /* Bold text for emphasis */
+  color: #fff;                       /* White text color */
+  background-color: #0e3152;         /* Blue background color */
+  border-radius: 5px;                /* Rounded corners */
+  text-align: center;                /* Centers the text inside the button */
+  text-decoration: none;             /* Removes underline from link */
+  transition: all 0.3s ease;         /* Smooth transition for hover effect */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);  /* Subtle shadow for depth */
+}
+
+.view-button:hover {
+  background-color: #073281;         /* Darker blue background on hover */
+  transform: translateY(-3px);       /* Slight lift effect */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); /* Slight increase in shadow on hover */
+}
+
+.view-button:active {
+  background-color: #003f7f;         /* Even darker blue when the button is clicked */
+  transform: translateY(0);           /* Resets the lift effect when clicked */
+}
+
+.view-button:focus {
+  outline: none;                     /* Removes the outline on focus */
+  box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.5); /* Add a blue focus ring */
+}
+
+
+/* .head-title h1 {
+  border-bottom: 2px solid #000000;  
+  padding-bottom: 10px;  
+} */
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="head-title">
+  <h1>Dashboard</h1>
+</div>
+
+<div class="main">
+  <!-- Card with Doughnut Chart -->
+  <div class="card">
+    <h2>Complaints by Location</h2>
+    <canvas id="locationDoughnut" width="260" height="380"
+      style="display: block; box-sizing: border-box; height: 300px; width: 200px;"></canvas>
+  </div>
+
+  <!-- Card with Pie Chart -->
+  <div class="card">
+    <h2>Complaints by Status</h2>
+    <canvas id="statusPie"></canvas>
+    <!-- <canvas id="statusPie" width="420" height="480" style="display: block;box-sizing: border-box;height: 250px;width: 220px;"></canvas> -->
+  </div>
+
+  <div class="card">
+    <h2>Resolver Score</h2>
+    <canvas id="resolverScoreChart"></canvas>
+  </div>
+</div>
+
+<!-- Large Cards Container -->
+<div class="large-card-container">
+  <div class="card large-card">
+    <h2>Complaint Categories</h2>
+    <canvas id="categoryChart"></canvas>
+  </div>
+
+  <div class="card large-card">
+    <h2>Resolved Complaint</h2>
+    <canvas id="resolverPerformanceChart"></canvas>
+  </div>
+</div>
+
+
+<div class="table-container">
+  <div class="header-container">
+      <h2>All Complaints</h2>
+  <form method="get" action="{% url 'resolverdashboard' %}" class="filter-form">
+    <div class="form-group">
+        <label for="fromdate">From Date:</label>
+        <input type="date" id="fromdate" name="fromdate" value="{{ fromdate }}">
+    </div>
+    <div class="form-group">
+        <label for="todate">To Date:</label>
+        <input type="date" id="todate" name="todate" value="{{ todate }}">
+    </div>
+    <button type="submit">Filter</button>
+</form>
+</div>
+  <div class="scrollable-table">
+      <table id="complaintsTable" class="display">
+          <thead>
+              <tr>
+                <th>Name</th>  <!-- New column for ID -->
+                <th>Department</th>
+                <th>Complaint Type</th>
+                <th>Description</th>
+                <th>Location</th>
+                <th>Raised On</th>  <!-- New column for Issue Raised Date -->
+                <th>Due Date</th>
+                <th>Revised Date</th>
+                <th>Reason</th>
+                <th>Resolved At</th>
+                <th>Status</th>
+                <th>Resolution</th>
+                <th>Action</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for data in dashboard_data %}
+              <tr>
+                  <td>{{ data.user_name }}</td>
+                  <td>{{ data.department }}</td>
+                  <td>{{ data.complaint_type }}</td>
+                  <td>{{ data.description }}</td>
+                  <td>{{ data.location }}</td>
+                  <td>{{ data.issue_raise_date }}</td>
+                  <td>{{ data.due_date }}</td>
+                  <td>{{ data.updated_due_date }}</td>
+                  <td>{{ data.reason }}</td>
+                  <td>{{ data.updated_at }}</td>
+                  <td>
+                    <span class="{% if data.status|lower == 'pending' %}status-pending
+                                  {% elif data.status|lower == 'work in progress' %}status-progress
+                                  {% elif data.status|lower == 'overdue' %}status-overdue
+                                  {% elif data.status|lower == 'resolved' %}status-resolved{% endif %}">
+                      
+                      {% if data.status|lower == 'pending' %}
+                        <i class="fas fa-clock"></i> <!-- Icon for Pending -->
+                      {% elif data.status|lower == 'work in progress' %}
+                        <i class="fas fa-spinner"></i> <!-- Icon for Work in Progress -->
+                      {% elif data.status|lower == 'overdue' %}
+                        <i class="fas fa-exclamation-triangle"></i> <!-- Icon for Overdue -->
+                      {% elif data.status|lower == 'resolved' %}
+                        <i class="fas fa-check-circle"></i> <!-- Icon for Resolved -->
+                      {% endif %}
+                      
+                      <strong>{{ data.status }}</strong>
+                    </span>
+                  </td>
+                  <td>{{ data.resolution }}</td>
+                  <td><a href="{% url 'update_complaint_status' data.complaint_id %}" class="view-button">View</a></td>
+                  
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
+<!-- DataTables Buttons CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+
+<!-- DataTables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+
+<!-- JSZip for Excel export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<!-- PDFMake for PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#complaintsTable').DataTable({
+            paging: true, // Enable pagination
+            searching: true, // Enable search
+            ordering: true, // Enable column ordering
+            responsive: true, // Enable responsiveness
+            lengthMenu: [3,5, 10, 25, 50], // Options for number of rows
+            columnDefs: [
+                { orderable: false, targets: -1 } // Disable ordering for the Action column
+            ],
+            language: {
+                search: "Search Complaints:", // Customize search box label
+                lengthMenu: "Display _MENU_ records per page",
+                zeroRecords: "No complaints found",
+                info: "Showing _START_ to _END_ of _TOTAL_ complaints",
+                infoEmpty: "No records available",
+                paginate: {
+                    previous: "Previous",
+                    next: "Next"
+                }
+            },
+
+        });
+    });
+</script>
+
+<script>
+  
+var locations = {{ locations|safe }};  // Inject the 'locations' list from Django
+var locationCounts = {{ location_counts|safe }};  // Inject the 'location_counts' list from Django
+
+var ctxLocation = document.getElementById('locationDoughnut').getContext('2d');
+new Chart(ctxLocation, {
+    type: 'doughnut',
+    data: {
+        labels: locations,  // Dynamically use locations from Django
+        datasets: [{
+            label: 'Complaints by Location',
+            data: locationCounts,  // Dynamically use location counts from Django
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.7)', 
+                'rgba(30, 136, 229, 0.7)', 
+                'rgba(41, 121, 255, 0.7)',  
+                'rgba(0, 96, 255, 0.7)',   
+                'rgba(0, 83, 179, 0.7)',   
+            ],
+            borderColor: [
+                'rgba(41, 155, 99, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(120, 46, 139, 1)',
+                'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        aspectRatio: 1,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom',  // Legend at the bottom
+            },
+            datalabels: {
+                display: true,  // Enable labels
+                color: 'black',  // Label text color
+                font: {
+                    size: 14,  // Font size
+                    weight: 'bold',  // Font weight
+                },
+                align: 'center',  // Align labels in the center of the slice
+                anchor: 'center',  // Anchor labels at the center
+                offset: 10,  // Offset for better readability
+                padding: 5,  // Add padding around the label
+                rotation:90,
+                rotation: function(context) {
+                    // Dynamically rotate labels for better alignment
+                    var index = context.dataIndex;
+                    var total = context.chart.data.labels.length;
+                    return index * (360 / total);  // Evenly distribute rotation
+                },
+                textAlign: 'center',  // Align text centrally within the label
+                clamp: true,  // Prevent text from overflowing
+                formatter: function(value, context) {
+                    // Customize label content: add location and value
+                    var label = context.chart.data.labels[context.dataIndex];
+                    return `${label}  ${value} `;
+                },
+            }
+        }
+    },
+    plugins: [ChartDataLabels]  // Enable the datalabels plugin
+});
+
+
+
+
+var statuses = {{ statuses|safe }};  // Dynamic labels from Django context
+var statusCounts = {{ status_counts|safe }};  // Dynamic data from Django context
+
+var ctxStatus = document.getElementById('statusPie').getContext('2d');
+new Chart(ctxStatus, {
+    type: 'pie',
+    data: {
+        labels: statuses,  // Dynamic labels from Django
+        datasets: [{
+            label: 'Complaints by Status',
+            data: statusCounts,  // Dynamic data from Django
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 182, 193, 0.6)',
+                'rgba(201, 203, 207, 0.6)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 182, 193, 1)',
+                'rgba(201, 203, 207, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        aspectRatio: 1,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom',
+            },
+            datalabels: {
+                color: 'black',  // Text color
+                font: {
+                    weight: 'bold',
+                    size: 12
+                },
+                formatter: function(value, context) {
+                    var label = statuses[context.dataIndex];  // Get the status label
+                    label = label.charAt(0).toUpperCase() + label.slice(1);  // Capitalize the first letter
+                    return `${label} ${value}`;  // Format as "Status: Count"
+                },
+                // Rotation for labels and values
+                rotation: function(context) {
+                    // Calculate rotation based on index and position
+                    var index = context.dataIndex;
+                    var totalSlices = context.chart.data.labels.length;
+                    var angle = (index * 60) / totalSlices; // Evenly distribute rotation
+                    return angle; // Rotate based on slice index
+                },
+                textAlign: 'center',  // Center align text within the slice
+                align: 'center',      // Align in the center of the slice
+                anchor: 'center',     // Anchor the text in the center
+                offset: 10,           // Offset the label slightly from the center if needed
+                padding: 5,           // Add some padding for better spacing
+                clamp: true,          // Prevent overflow of text
+            }
+        }
+    },
+    plugins: [ChartDataLabels]  // Enable the datalabels plugin
+});
+
+
+
+
+var resolverScore = {{ resolver_score_percentage }};  // Resolver's resolved complaints as percentage
+var totalComplaints = {{ total_complaints }};  // Total complaints assigned to resolver
+
+// Create a doughnut chart
+var ctxSingle = document.getElementById('resolverScoreChart').getContext('2d');
+var singleResolverChart = new Chart(ctxSingle, {
+    type: 'doughnut',  // Doughnut chart type
+    data: {
+        labels: [
+            `Resolved ${resolverScore.toFixed(2)}%`,  // Format resolved percentage to 2 decimal places
+            `Remaining ${(100 - resolverScore).toFixed(2)}%`  // Format remaining percentage to 2 decimal places
+        ],  // Labels with percentages
+        datasets: [{
+            data: [resolverScore, 100 - resolverScore],  // Data representing resolved and remaining complaints
+            backgroundColor: [
+                'rgba(75, 192, 192, 0.7)',  // Light Green for resolved
+                'rgba(192, 192, 192, 0.7)'  // Light Grey for remaining
+            ],
+            borderColor: [
+                'rgba(75, 192, 192, 1)',  // Border color for resolved
+                'rgba(192, 192, 192, 1)'  // Border color for remaining
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom' // Position of the legend
+            },
+            datalabels: {
+                color: 'black',  // Text color
+                font: {
+                    weight: 'bold',
+                    size: 11
+                },
+                align: 'center',  // Align labels in the center of the slice
+                anchor: 'center',  // Anchor labels at the center
+                offset: 15,  // Offset for better readability
+                padding: 5,  // Add padding around the label
+                rotation: function(context) {
+                    var index = context.dataIndex;
+                    var total = context.chart.data.labels.length;
+                    return index * (120 / total);  // Rotate slices (adjust this if necessary)
+                },
+                formatter: function(value, context) {
+                    // Customize the text for each section and format it to 2 decimal places
+                    if (context.dataIndex === 0) {
+                        return `Resolved  ${value.toFixed(0)}%`;  // Format resolved section to 2 decimal places
+                    } else {
+                        return `Remaining  ${value.toFixed(0)}%`;  // Format remaining section to 2 decimal places
+                    }
+                }
+            }
+        },
+        responsive: true,
+        maintainAspectRatio: false  // Allow resizing
+    },
+    plugins: [ChartDataLabels]  // Enable the datalabels plugin for displaying the values
+});
+
+
+var categories = {{ categories|safe }};  // Django context for categories
+var categoryCounts = {{ category_counts|safe }};  // Django context for counts
+
+var categoryChartCtx = document.getElementById('categoryChart').getContext('2d');
+new Chart(categoryChartCtx, {
+    type: 'bar',  // Bar chart type
+    data: {
+        labels: categories,  // Dynamically use categories
+        datasets: [{
+            label: 'Number of Complaints',
+            data: categoryCounts,  // Dynamically use category counts
+            backgroundColor: [
+                'rgba(0, 123, 255, 0.9)',   
+                'rgba(0, 51, 102, 0.9)',    
+                'rgba(70, 130, 180, 0.9)',  
+                'rgba(85, 174, 213, 0.9)',   
+            ],
+            borderColor: [
+                'rgba(75, 192, 192, 1)',
+                'rgba(255, 159, 64, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(153, 102, 255, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+            },
+            tooltip: {
+                callbacks: {
+                    label: function (tooltipItem) {
+                        return tooltipItem.raw + ' Complaints';  // Display the count in the tooltip
+                    }
+                }
+            },
+            datalabels: {
+                anchor: 'center',  // Align in the center of the bar
+                align: 'center',   // Center text in the bar
+                display: function (context) {
+                    return context.hovered;  // Show only when hovered
+                },
+                color: 'black',     // Text color
+                font: {
+                    weight: 'bold',
+                    size: 12          // Adjust font size
+                },
+                formatter: function (value) {
+                  return  value;  // Display as "Complaints: X"
+                }
+            }
+        },
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Categories'  // X-axis title
+                }
+            },
+            y: {
+                beginAtZero: true,  // Start Y-axis from zero
+                ticks: {
+          stepSize: 1, // Increment by 1
+          callback: function(value) {
+            return value; // Display tick values as 0, 1, 2, etc.
+          },
+        },
+                title: {
+                    display: true,
+                    text: 'Number of Complaints'  // Y-axis title
+                }
+            }
+        }
+    },
+    plugins: [ChartDataLabels]  // Enable the datalabels plugin
+});
+
+
+
+var resolvers = {{ locations2|safe }};  // Django context for locations
+var resolver_counts = {{ location_counts2|safe }};  // Django context for complaint counts
+
+const resolverPerformanceCtx = document
+  .getElementById('resolverPerformanceChart')
+  .getContext('2d');
+
+new Chart(resolverPerformanceCtx, {
+  type: 'bar',  // Bar chart type
+  data: {
+    labels: resolvers,  // Dynamically use locations
+    datasets: [
+      {
+        label: 'Complaints Resolved',
+        data: resolver_counts,  // Dynamically use complaint counts
+        backgroundColor: [
+          'rgba(0, 123, 255, 1)',   
+          'rgba(0, 153, 255, 1)',  
+          'rgba(4, 20, 38, 1)',   // Obsidian Blue
+          'rgba(40, 60, 100, 1)', // Frosted Sapphire
+          'rgba(60, 120, 150, 1)' // Aqua Horizon
+        ],
+        borderColor: [
+          'rgba(54, 162, 235, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(255, 159, 64, 1)',
+          'rgba(153, 102, 255, 1)',
+          'rgba(150, 100, 250, 1)',
+        ],
+        borderWidth: 1,
+      },
+    ],
+  },
+  options: {
+    indexAxis: 'y',  // Horizontal bar chart
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+      },
+      tooltip: {
+        callbacks: {
+          label: function (tooltipItem) {
+            return 'Complaints: ' + tooltipItem.raw;  // Format the tooltip text
+          },
+        },
+      },
+      datalabels: {
+        anchor: 'center',  // Center text inside the bar
+        align: 'center',   // Center the label
+        display: function (context) {
+          return context.hovered;  // Show label only on hover
+        },
+        color: 'black',     // Label text color
+        font: {
+          weight: 'bold',
+          size: 12          // Font size
+        },
+        formatter: function (value) {
+          return  value;  // Format the label inside the bar
+        }
+      }
+    },
+    scales: {
+      x: {
+        beginAtZero: true,  // Start the X-axis at zero
+        ticks: {
+          stepSize: 1, // Increment by 1
+          callback: function(value) {
+            return value; // Display tick values as 0, 1, 2, etc.
+          },
+        },
+        title: {
+          display: true,
+          text: 'Number of Complaints Resolved',  // X-axis title
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Locations',  // Y-axis title
+        },
+      },
+    },
+  },
+  plugins: [ChartDataLabels],  // Enable the datalabels plugin
+});
+</script>
+{% endblock %}

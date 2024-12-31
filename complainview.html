@@ -1,0 +1,78 @@
+{% extends "master.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Card Container */
+        .user-card {
+            max-width: 500px; /* Set a max width for the card */
+            margin: 20px auto; /* Center the card */
+            border: 1px solid #ddd; /* Border around the card */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            padding: 20px; /* Inner spacing */
+            height: 450px; /* Increased height of the card */
+            display: flex; /* Flexbox layout */
+            flex-direction: column; /* Column direction */
+            align-items: center; /* Center items */
+            height: auto; /* Allow height to adjust based on content */
+            overflow: hidden; /* Hide overflow */
+        }
+        .icon {
+            font-size: 100px; /* Larger icon size */
+            color: #007BFF; /* Icon color */
+            margin-bottom: 15px; /* Space below icon */
+        }
+        h3 {
+            margin: 10px 0; /* Margin above and below */
+            font-size: 24px; /* Title size */
+            font-weight: bold; /* Bold title */
+            text-align: center; /* Center the title */
+        }
+        .info {
+            margin-bottom: 10px; /* Space between info items */
+            font-size: 16px; /* Info text size */
+            color: #333; /* Info text color */
+            text-align: left; /* Left align text */
+            width: 100%; /* Full width */
+            padding-left: 10px; /* Left padding for text */
+            overflow-wrap: break-word; /* Break long words to prevent overflow */
+        }
+        .info span {
+            font-weight: bold; /* Bold for labels */
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {% if complaint %}
+        <div class="user-card">
+            <i class="fas fa-user-circle icon"></i> <!-- User icon -->
+            <h3>{{ complaint.user_name }}</h3> <!-- User name -->
+            <div class="info"><span>Location:</span> {{ complaint.location }}</div>
+            <div class="info"><span>Department:</span> {{ complaint.department }}</div>
+            <div class="info"><span>Complain Type:</span> {{ complaint.complaint_type }}</div>
+            <div class="info"><span>Issue Date:</span> {{ complaint.issue_raise_date }}</div>
+            <div class="info"><span>Due Date:</span> {{ complaint.due_date }}</div>
+            <div class="info"><span>Status:</span> {{ complaint.status }}</div>
+            <div class="info"><span>Description:</span> {{ complaint.description }}</div>
+            <div class="info"><span>Resolved At:</span> {{ complaint.resolved_at }}</div> <!-- Display Resolved At -->
+            <div class="info"><span>Resolution:</span> {{ complaint.resolution }}</div> <!-- Display Resolved At -->
+
+            {% if complaint.tat %}
+                <div class="info"><span>Resolution Time:</span> {{ complaint.tat }}</div>
+            {% else %}
+                <div class="info"><span>Resolution Time:</span> Not applicable</div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="error-message">{{ error }}</div>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // You can add JavaScript functionality here if needed
+        console.log("User card is displayed!");
+    </script>
+{% endblock %}

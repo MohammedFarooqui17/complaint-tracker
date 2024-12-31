@@ -1,0 +1,132 @@
+{% extends "sidebarU.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Scoped styles for the edit complaint form */
+        .complaint-form {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 75vh;
+            padding: 20px;
+        }
+        .form-container {
+            border: 2.5px solid #ddd;
+            border-radius: 1px;
+            width: 1000px;
+            padding: 20px;
+            box-sizing: border-box;
+            margin-top: -30px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 300px;
+        }
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-container input,
+        .form-container select,
+        .form-container textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 1px;
+            box-sizing: border-box;
+            background-color: transparent;
+        }
+        .description-group {
+            flex-basis: 100%;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            background-color: #0e3152;
+            border: none;
+            border-radius: 1px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button-container button:hover {
+            background-color: #0e3152;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="complaint-form" style="margin-top: 40px;">
+    <div class="form-container">
+        <h2>Edit Complaint</h2>
+        <form action="{% url 'editcomplain' complaint.id %}" method="POST">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" value="{{ complaint.name }}" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="location">Location:</label>
+                    <select id="location" name="location" required>
+                        <option value="mumbai" {% if complaint.location == 'mumbai' %}selected{% endif %}>Mumbai</option>
+                        <option value="bangalore" {% if complaint.location == 'bangalore' %}selected{% endif %}>Bangalore</option>
+                        <option value="chennai" {% if complaint.location == 'chennai' %}selected{% endif %}>Chennai</option>
+                        <option value="gurgaon" {% if complaint.location == 'gurgaon' %}selected{% endif %}>Gurgaon</option>
+                        <option value="indore" {% if complaint.location == 'indore' %}selected{% endif %}>Indore</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="department">Department:</label>
+                    <select id="department" name="department" required>
+                        <option value="it" {% if complaint.department == 'it' %}selected{% endif %}>IT</option>
+                        <option value="system admin" {% if complaint.department == 'system admin' %}selected{% endif %}>System Admin</option>
+                        <option value="agent" {% if complaint.department == 'agent' %}selected{% endif %}>Agent</option>
+                        <option value="it support" {% if complaint.department == 'it support' %}selected{% endif %}>IT Support</option>
+                        <option value="hr" {% if complaint.department == 'hr' %}selected{% endif %}>HR</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="complaint-type">Complaint Type:</label>
+                    <input type="text" id="complaint-type" name="complaint-type" value="{{ complaint.complaint_type }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="issue-date">Issue Date & Time:</label>
+                    <input type="datetime-local" id="issue-date" name="issue-date" value="{{ complaint.issue_raise_date|date:'Y-m-d\TH:i' }}" required>
+                </div>
+            </div>
+            <div class="form-row description-group">
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" rows="4" required>{{ complaint.description }}</textarea>
+                </div>
+            </div>
+            <div class="button-container">
+                <button type="submit" style="color: white;">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <!-- Add any specific scripts here if needed -->
+{% endblock %}

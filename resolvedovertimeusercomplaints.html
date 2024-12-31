@@ -1,0 +1,206 @@
+{% extends "sidebarU.html" %}
+
+{% block styles %}
+<style>
+  /* Reuse the styles from the reference CSS */
+  .head-title h1 {
+    font-weight: bold;
+    font-size: 35px;
+    margin: 0 0 25px 20px;
+  }
+
+  .table-container {
+    max-width: 1200px; /* Width for the tables */
+    margin: auto; /* Center the tables */
+    margin-bottom: 40px; /* Space between tables */
+    border-radius: 5px; /* Rounded corners */
+    padding: 20px; /* Inner spacing */
+    height: auto;
+    min-height: 380px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    background-color: transparent; /* White background */
+}
+
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+
+th {
+  background-color: #f4f4f4; /* Light gray for header */
+  color: #333; /* Dark text for better readability */
+  font-weight: bold;
+}
+
+
+  tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+
+  .status-in-progress {
+    color: #8a7605d0; /* Golden Yellow */
+    font-weight: bold;
+}
+
+.status-in-progress i {
+    color: inherit; /* Inherit color from the parent (text) */
+}
+.icon-gap {
+    margin-right: 5px; /* Adjust the value as needed */
+}
+
+  .pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  .pagination button {
+    padding: 8px 16px;
+    border: none;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+    margin-left: 5px;
+  }
+
+  .pagination button:disabled {
+    background-color: #007BFF;
+    cursor: not-allowed;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="head-title">
+  <h1>Overtime Resolutions</h1>
+</div>
+
+<div class="table-container">
+    <table id="complaintTable" class="display">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Department</th>
+          <th>Location</th>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Due Date</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Resolved At</th>
+          <th>TAT</th> <!-- New column for Time to Resolve -->
+        </tr>
+      </thead>
+      <tbody>
+        {% for complaint in complaints %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ complaint.user_name }}</td>
+          <td>{{ complaint.department }}</td>
+          <td>{{ complaint.location }}</td>
+          <td>{{ complaint.complaint_type }}</td>
+          <td>{{ complaint.issue_raise_date }}</td>
+          <td>{{ complaint.due_date }}</td>
+          <td>{{ complaint.description }}</td>
+          <td class="status-{{ complaint.status|lower }}">
+            <i class="fas fa-check-circle icon-gap"></i>{{ complaint.status|capfirst }}
+          </td> <!-- Added dynamic status class for resolved -->
+          <td>{{ complaint.resolved_at }}</td>  <!-- Display resolved timestamp -->
+          <td>{{ complaint.tat }}</td> <!-- Display the formatted TAT -->
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="11" style="text-align: center;">No resolved complaints found within time.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
+<!-- DataTables Buttons CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+
+<!-- DataTables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+
+<!-- JSZip for Excel export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<!-- PDFMake for PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+
+<script>
+  $(document).ready(function () {
+    // Initialize DataTables for complaintTable
+    $('#complaintTable').DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        responsive: true,
+        lengthMenu: [5, 10, 25, 50],  // Controls how many rows are shown per page
+        columnDefs: [
+            { orderable: false, targets: -1 }  // Makes the last column non-orderable (Resolved By column)
+        ],
+        language: {
+            search: "Search Complaint:",
+            lengthMenu: "Display _MENU_ records per page",
+            zeroRecords: "No complaints found",
+            info: "Showing _START_ to _END_ of _TOTAL_ complaints",
+            infoEmpty: "No records available",
+            paginate: {
+                previous: "Previous",
+                next: "Next"
+            }
+        },
+        initComplete: function() {
+            // Apply custom CSS styles to move the search box label and input up
+            $('#complaintTable_filter label').css({
+                'position': 'relative',
+                'top': '-8px',  // Adjust the value as needed to move the search box up
+                'left': '0'
+            });
+            $('#complaintTable_filter input').css({
+                'position': 'relative',
+                'top': '-3px'  // Adjust the value as needed to move the search box up
+            });
+        }
+    });
+  });
+</script>
+
+<script type="text/javascript">
+  // This script will force a redirect to login if the user navigates back
+  if (!sessionStorage.getItem('loggedIn')) {
+    window.location.href = "{% url 'login' %}";
+  }
+</script>
+
+{% endblock %}

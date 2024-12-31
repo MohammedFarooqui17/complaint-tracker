@@ -1,0 +1,211 @@
+{% extends "master.html" %}
+
+
+{% block styles %}
+<style>
+    .form-container {
+        max-width: 700px; /* Increased form width */
+        margin: auto;
+        padding: 30px; /* Increased padding for better spacing */
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+
+    .form-container h2 {
+        text-align: left; /* Align text to the left */
+        width: 100%; /* Ensure the h2 spans the full width of the container */
+        margin-bottom: 20px; /* Optional: adds space below the heading */
+    }
+
+
+    .form-group {
+        margin-bottom: 20px; /* Added space between input and button */
+        width: 100%;
+    }
+
+
+    .form-group label {
+        font-size: 1.2em; /* Increased label font size */
+        margin-bottom: 10px; /* Added space below the label */
+        display: block;
+    }
+
+
+    .form-group input {
+        font-size: 1.1em; /* Increased input font size */
+        padding: 10px; /* Increased padding inside input */
+        height: 50px; /* Increased input height */
+        width: 100%; /* Make input full-width */
+        box-sizing: border-box;
+    }
+
+
+    .form-buttons {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        gap: 10px;
+    }
+
+
+    .btn {
+        font-size: 1.1em; /* Increased button font size */
+        padding: 8px 16px; /* Smaller button padding */
+        width: auto; /* Button width set to auto */
+        background-color: #74a6dc;
+    }
+
+
+    .location-list {
+        margin-top: 40px;
+        width: 100%;
+    }
+
+
+    .location-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+
+    .location-item .btn {
+        font-size: 0.9em; /* Smaller button font size */
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="form-container">
+    <h2>Manage Locations</h2>
+    <form id="locationForm" method="post" action="{% url 'locations' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="location_name">Location Name</label>
+            <input type="text" id="location_name" name="location_name" class="form-control" required>
+        </div>
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary">Add</button>
+        </div>
+    </form>
+</div>
+
+
+<div class="location-list mt-4">
+    <div id="locationsContainer">
+        {% for location in locations %}
+            <div class="location-item" id="location-{{ location.id }}">
+                <span>{{ location.location }}</span>
+                <div>
+                    <a href="javascript:void(0);" class="btn btn-sm btn-warning edit-btn" data-id="{{ location.id }}" data-name="{{ location.location }}">Edit</a>
+                    <a href="javascript:void(0);" class="btn btn-sm btn-danger delete-btn" data-id="{{ location.id }}">Delete</a>
+                </div>
+            </div>
+        {% empty %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let editingLocationId = null;  // Track the ID of the location being edited
+
+        // Edit location
+        document.querySelectorAll(".edit-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                editingLocationId = this.dataset.id;  // Get the location ID
+                const locationName = this.dataset.name;
+
+                // Populate form with the selected location's name
+                const nameField = document.getElementById("location_name");
+                nameField.value = locationName;
+
+                // Change form submit button text to indicate editing
+                document.querySelector(".form-buttons button[type='submit']").textContent = "Update";
+            });
+        });
+
+        // Form submit handler for add/edit functionality
+        document.getElementById("locationForm").addEventListener("submit", function (e) {
+            e.preventDefault();  // Prevent default form submission
+
+            const locationName = document.getElementById("location_name").value;
+            const url = editingLocationId 
+                ? `/editlocation/${editingLocationId}/`  // Edit URL if editing
+                : `{% url 'locations' %}`;  // Add URL if not editing
+
+            // Make the request to the appropriate endpoint
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ location_name: locationName })  // Send data as JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (editingLocationId) {
+                        // Update the location name in the location list without reloading
+                        document.querySelector(`#location-${editingLocationId} span`).textContent = locationName;
+                    } else {
+                        // If adding a new location, append it to the list
+                        const newLocationHtml = `
+                            <div class="location-item" id="location-${data.location.id}">
+                                <span>${locationName}</span>
+                                <div>
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-warning edit-btn" data-id="${data.location.id}" data-name="${locationName}">Edit</a>
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-danger delete-btn" data-id="${data.location.id}">Delete</a>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById("locationsContainer").insertAdjacentHTML("beforeend", newLocationHtml);
+                    }
+
+                    // Clear the form and reset
+                    document.getElementById("location_name").value = "";
+                    document.querySelector(".form-buttons button[type='submit']").textContent = "Add";
+                    editingLocationId = null;
+                } else {
+                    alert(data.message || 'Error updating location');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Delete location
+        document.querySelectorAll(".delete-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const locationId = this.dataset.id;
+
+                fetch(`/deletelocation/${locationId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById(`location-${locationId}`).remove();
+                    } else {
+                        alert(data.message || 'Error deleting location');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+</script>
+{% endblock %}

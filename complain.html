@@ -1,0 +1,224 @@
+{% extends "sidebarU.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Scoped styles for the complaint form */
+        .complaint-form {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to the start for more space at the bottom */
+            height: 75vh; /* Further reduced height for more upward position */
+            padding: 20px; /* Prevent content touching the edges */
+        }
+        .form-container {
+            border: 2.5px solid #ddd;
+            border-radius: 1px;
+            width: 1000px; /* Increased width */
+            padding: 20px;
+            box-sizing: border-box;
+            margin-top: -30px; /* Increased negative margin to lift it further */
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap; /* Allows items to wrap in smaller screens */
+            gap: 15px; /* Space between columns */
+            margin-bottom: 15px;
+        }
+        .form-group {
+            flex: 1; /* Allows equal width for the columns */
+            min-width: 300px; /* Minimum width to maintain usability */
+        }
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-container input,
+        .form-container select,
+        .form-container textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 1px;
+            box-sizing: border-box;
+            background-color: transparent; /* Remove background color */
+        }
+        .description-group {
+            flex-basis: 100%; /* Full width for the description */
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            background-color: #0e3152;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button-container button:hover {
+            background-color: #0e3152;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="complaint-form" style="margin-top: 50px;">
+    <div class="form-container">
+        <h2>Complaint Form</h2>
+        <form action="{% url 'complain' %}" method="POST">
+            {% csrf_token %}
+
+            <div class="form-row">
+                <div class="form-group">
+                <label for="location">Location:</label>
+                <input type="text" id="location" name="location" value="{{ user_location }}" readonly class="non-editable-input">
+
+                    <div id="custom-location-div" style="display:none;">
+                        <label for="custom_location">Custom Location:</label>
+                        <input type="text" id="custom_location" name="custom_location">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                <label for="department">Department Name:</label>
+                <input type="text" id="department" name="department" value="{{ user_department }}" readonly class="non-editable-input">
+                    <div id="custom_department" style="display: none;">
+                        <label for="custom_department">Custom Department:</label>
+                        <input type="text" name="custom_department" placeholder="Enter custom department">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <!-- <div class="form-group">
+                    <label for="complaint-type">Complaint Type:</label>
+                    <select id="complaint-type" name="complaint-type">
+                        <option value="">Select Complaint Type</option>
+                    </select>
+                </div> -->
+
+                <div class="form-group">
+                    <label for="department">Complaint Department:</label>
+                    <select id="departments" name="department">
+                        <option value="">Select Department</option>
+                        {% for dept in record3 %}
+                            <option value="{{ dept.department }}">{{ dept.department }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="complaint-type">Complaint Type:</label>
+                    <select id="complaint-type" name="complaint-type">
+                        <option value="">Select Complaint Type</option>
+                    </select>
+                </div>
+
+
+            </div>
+            <div class="form-row description-group">
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" rows="4" required></textarea>
+                </div>
+            </div>
+            <div class="button-container">
+                <button type="submit" style="color: white;">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+    $(document).ready(function() {
+        $('#departments').on('change', function() {
+            var selectedDept = $(this).val();
+            
+            if (selectedDept) {
+                $.ajax({
+                    url: '{% url "getcomplainttypes" %}', // Django URL for the view
+                    type: 'GET', // Ensure this is a GET request
+                    data: {
+                        'dept': selectedDept
+                    },
+                    success: function(response) {
+                        var $complaintTypeSelect = $('#complaint-type');
+                        $complaintTypeSelect.empty(); // Clear existing options
+                        
+                        // Add a default option
+                        $complaintTypeSelect.append(
+                            $('<option>', {
+                                value: '',
+                                text: 'Select Complaint Type'
+                            })
+                        );
+    
+                        // Populate with new options from response data
+                        $.each(response.data, function(index, item) {
+                            $complaintTypeSelect.append(
+                                $('<option>', {
+                                    value: item.complaint_type,
+                                    text: item.complaint_type
+                                })
+                            );
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching complaint types:', error);
+                    }
+                });
+            } else {
+                // Reset complaint types if no department is selected
+                $('#complaint-type').empty().append(
+                    $('<option>', {
+                        value: '',
+                        text: 'Select Complaint Type'
+                    })
+                );
+            }
+        });
+    });
+    
+
+    function setCurrentDateTime() {
+        const dateInput = document.getElementById('issue-date');
+        const now = new Date();
+        
+        const offset = 0 * 60; // IST offset in minutes
+        const localTime = new Date(now.getTime() + (offset - now.getTimezoneOffset()) * 60000);
+        
+        const formattedDate = localTime.toISOString().slice(0, 16);
+        dateInput.value = formattedDate;
+        
+        dateInput.setAttribute('readonly', true);
+    }
+
+    window.onload = setCurrentDateTime;
+
+    function toggleCustomLocation(selectElement) {
+        const customLocationDiv = document.getElementById('custom-location-div');
+        customLocationDiv.style.display = selectElement.value === 'other' ? 'block' : 'none';
+    }
+
+    function toggleCustomDepartment(selectElement) {
+        const customDepartmentDiv = document.getElementById('custom_department');
+        customDepartmentDiv.style.display = selectElement.value === 'other' ? 'block' : 'none';
+    }
+
+    function toggleCustomComplaintType(selectElement) {
+        const customComplaintTypeDiv = document.getElementById('custom_complaint_type');
+        customComplaintTypeDiv.style.display = selectElement.value === 'other' ? 'block' : 'none';
+    }
+</script>
+{% endblock %}

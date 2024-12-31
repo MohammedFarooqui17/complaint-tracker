@@ -1,0 +1,484 @@
+{% extends "master.html" %}
+
+
+{% block styles %}
+<style>
+    .form-container {
+        max-width: 1200px; /* Increased form width */
+        margin: auto;
+        padding: 30px; /* Increased padding for better spacing */
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+
+    .form-container h2 {
+        text-align: left; /* Align text to the left */
+        width: 100%; /* Ensure the h2 spans the full width of the container */
+        margin-bottom: 20px; /* Optional: adds space below the heading */
+    }
+
+
+    .form-group {
+        margin-bottom: 20px; /* Added space between input and button */
+        width: 100%;
+    }
+
+
+    .form-group label {
+        font-size: 1.2em; /* Increased label font size */
+        margin-bottom: 10px; /* Added space below the label */
+        display: block;
+    }
+
+
+    .form-group input {
+        font-size: 1.1em; /* Increased input font size */
+        padding: 10px; /* Increased padding inside input */
+        height: 50px; /* Increased input height */
+        width: 100%; /* Make input full-width */
+        box-sizing: border-box;
+    }
+
+
+    .form-buttons {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        gap: 10px;
+    }
+
+
+    .btn {
+        font-size: 1.1em; /* Increased button font size */
+        padding: 8px 16px; /* Smaller button padding */
+        width: auto; /* Button width set to auto */
+        background-color:  #0e3152;
+        border-radius: 4px;
+        color: white;
+    }
+
+
+    .status-list {
+        margin-top: 40px;
+        width: 100%;
+    }
+
+
+    .status-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+
+    .status-item .btn {
+        font-size: 0.9em; /* Smaller button font size */
+    }
+    /* General table styling */
+    .table-container {
+        max-width: 1200px; /* Width for the tables */
+        margin: auto; /* Center the tables */
+        margin-bottom: 40px; /* Space between tables */
+        border-radius: 5px; /* Rounded corners */
+        padding: 20px; /* Inner spacing */
+        height: auto;
+        min-height: 380px;
+        box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        background-color: transparent; /* White background */
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+    }
+
+
+
+    th {
+        background-color: #f4f4f4; /* Light gray for header */
+        color: #333; /* Dark text for better readability */
+        font-weight: bold;
+    }
+
+
+
+/* Header styling */
+.header-container {
+    display: flex;
+    justify-content: space-between; /* Space between elements */
+    align-items: center;
+    border-radius: 4px;
+    margin-top: 20px;
+}
+
+
+#statusesTable {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+
+#statusesTable th,
+#statusesTable td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+
+#statusesTable th {
+    background-color:rgb(245, 242, 242);
+    color: inherit;
+    cursor: pointer;
+}
+
+
+#statusesTable tr:hover {
+    background-color: #f1f1f1;
+}
+
+
+#statusesTable .action-icons {
+    display: flex;
+    gap: 10px;
+}
+
+
+#statusesTable .btn {
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+
+#statusesTable .btn-warning {
+    background-color: #0e3152;
+    color: white;
+}
+
+
+#statusesTable .btn-danger {
+    background-color: #f44336;
+    color: white;
+}
+
+
+#statusesTable .btn:hover {
+    opacity: 0.8;
+}
+
+
+/* No data message */
+.no-data {
+    text-align: center;
+    font-style: italic;
+    color: #888;
+}
+
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+    #statusesTable {
+        font-size: 14px;
+    }
+
+
+    #statusesTable th, #statusesTable td {
+        padding: 8px;
+    }
+
+
+    .action-icons {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+
+    .btn {
+        font-size: 12px;
+    }
+}
+
+
+    /* Move the search input field a little up */
+    div.dataTables_filter {
+        margin-top: -10px;  /* Adjust the vertical margin to move it up */
+    }
+
+
+    /* Optionally move the label a little up */
+    div.dataTables_filter label {
+        margin-top: -5px;  /* Adjust the label's position */
+    }
+
+
+    h2{
+    margin-left: 50px;
+    margin-bottom: 33px;
+    font-size: 30px;
+    margin-top: -27px;
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<h2 style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">Manage Status</h2>
+<div class="form-container">
+
+    <form id="statusForm" method="post" action="{% url 'status' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="status_name"></label>
+            <input type="text" id="status_name" name="status_name" class="form-control" placeholder="Enter Your Status ..."  required>
+        </div>
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary" style="margin-left: 60px; width: 130px;">Add</button>
+        </div>
+    </form>
+</div>
+
+
+<div class="table-container">
+    <div class="header-container">
+        <!-- <h2>Status List</h2> -->
+    </div>
+
+
+    <div class="scrollable-table">
+        <table id="statusesTable" class="display">
+            <thead>
+                <tr>
+
+
+                    <th>Status</th>
+                    <th style="text-align: center; padding-right:-55px">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if statuses %}
+                    {% for status in statuses %}
+                    <tr id="status-{{ status.id }}">
+                        <td>{{ status.status }}</td>
+                        <td class="action-icons">
+                            <a href="javascript:void(0);" class="btn btn-sm btn-warning edit-btn" data-id="{{ status.id }}" data-name="{{ status.status }}" style="margin-left: 80px;">Edit</a>
+                            <a href="javascript:void(0);" class="btn btn-sm btn-danger delete-btn" data-id="{{ status.id }}" style="margin-right:-10px;">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="no-data">No statuses available.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
+
+<!-- DataTables Buttons CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+
+
+<!-- DataTables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+
+
+<!-- JSZip for Excel export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+
+<!-- PDFMake for PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+
+
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable
+        $('#statusesTable').DataTable({
+            "paging": true,           // Enable pagination
+            "lengthChange": true,     // Enable records per page selection
+            "searching": true,        // Enable search functionality
+            "ordering": true,         // Enable column sorting
+            "info": true,             // Show information about the current page
+            "autoWidth": false,       // Disable automatic column width adjustment
+            "pageLength": 5,         // Set default records per page to 10
+            "lengthMenu": [3,5, 10, 25, 50, 100], // Set the records per page options
+        });
+    });
+</script>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let editingStatusId = null;  // Track the ID of the status being edited
+        const addUrl = "{% url 'status' %}";  // Set the URL for adding a status
+
+
+        // Edit status
+        document.querySelectorAll(".edit-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                editingStatusId = this.dataset.id;  // Get the status ID
+                const statusName = this.dataset.name;
+
+
+                // Populate form with the selected status' name
+                document.getElementById("status_name").value = statusName;
+
+
+                // Change form submit button text to indicate editing
+                document.querySelector(".form-buttons button[type='submit']").textContent = "Update";
+            });
+        });
+
+
+        // Form submit handler for add/edit functionality
+        document.getElementById("statusForm").addEventListener("submit", function (e) {
+            e.preventDefault();  // Prevent default form submission
+
+
+            const statusName = document.getElementById("status_name").value;
+            const url = editingStatusId 
+                ? `/editstatus/${editingStatusId}/`  // Edit URL if editing
+                : addUrl;  // Add URL if not editing
+
+
+            // Make the request to the appropriate endpoint
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status_name: statusName })  // Send data as JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (editingStatusId) {
+                        // Update the status name dynamically
+                        const row = document.querySelector(`#status-${editingStatusId}`);
+                        row.querySelector("td:first-child").textContent = statusName;
+                    } else {
+                        // Add a new row dynamically
+                        const newRow = `
+                            <tr id="status-${data.status.id}">
+                                <td>${statusName}</td>
+                                <td class="action-icons">
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-warning edit-btn" data-id="${data.status.id}" data-name="${statusName}">Edit</a>
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-danger delete-btn" data-id="${data.status.id}">Delete</a>
+                                </td>
+                            </tr>`;
+                        document.querySelector("#statusesTable tbody").insertAdjacentHTML("beforeend", newRow);
+                        attachEventListeners();  // Reattach event listeners to new elements
+                    }
+
+
+                    // Clear the form and reset
+                    document.getElementById("status_name").value = "";
+                    document.querySelector(".form-buttons button[type='submit']").textContent = "Add";
+                    editingStatusId = null;
+                } else {
+                    alert(data.message || 'Error updating status');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+
+        // Delete status
+        document.querySelectorAll(".delete-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const statusId = this.dataset.id;
+
+
+                fetch(`/deletestatus/${statusId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById(`status-${statusId}`).remove();  // Remove the row dynamically
+                    } else {
+                        alert(data.message || 'Error deleting status');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+
+
+        // Reattach event listeners for dynamically added rows
+        function attachEventListeners() {
+            document.querySelectorAll(".edit-btn").forEach(button => {
+                button.addEventListener("click", function () {
+                    editingStatusId = this.dataset.id;
+                    document.getElementById("status_name").value = this.dataset.name;
+                    document.querySelector(".form-buttons button[type='submit']").textContent = "Update";
+                });
+            });
+
+
+            document.querySelectorAll(".delete-btn").forEach(button => {
+                button.addEventListener("click", function () {
+                    const statusId = this.dataset.id;
+                    fetch(`/deletestatus/${statusId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById(`status-${statusId}`).remove();
+                        } else {
+                            alert(data.message || 'Error deleting status');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

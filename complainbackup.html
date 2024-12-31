@@ -1,0 +1,142 @@
+{% extends "sidebarU.html" %}
+
+
+{% block styles %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Scoped styles for the complaint form */
+        .complaint-form {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to the start for more space at the bottom */
+            height: 75vh; /* Further reduced height for more upward position */
+            padding: 20px; /* Prevent content touching the edges */
+        }
+        .form-container {
+            border: 2.5px solid #ddd;
+            border-radius: 8px;
+            width: 1000px; /* Increased width */
+            padding: 20px;
+            box-sizing: border-box;
+            margin-top: -30px; /* Increased negative margin to lift it further */
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap; /* Allows items to wrap in smaller screens */
+            gap: 15px; /* Space between columns */
+            margin-bottom: 15px;
+        }
+        .form-group {
+            flex: 1; /* Allows equal width for the columns */
+            min-width: 300px; /* Minimum width to maintain usability */
+        }
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-container input,
+        .form-container select,
+        .form-container textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: transparent; /* Remove background color */
+        }
+        .description-group {
+            flex-basis: 100%; /* Full width for the description */
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            background-color: #3c91e6;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+<div class="complaint-form">
+    <div class="form-container">
+        <h2>Complaint Form</h2>
+        <form action="{% url 'complain' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" value="{{ user_name }}" readonly required>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status:</label>
+                    <input type="text" id="status" name="status" value="Pending" readonly>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="location">Location:</label>
+                    <select id="location" name="location" required>
+                        <option value="mumbai">Mumbai</option>
+                        <option value="bangalore">Bangalore</option>
+                        <option value="chennai">Chennai</option>
+                        <option value="gurgaon">Gurgaon</option>
+                        <option value="indore">Indore</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="department">Department:</label>
+                    <select id="department" name="department" required>
+                        <option value="IT">IT</option>
+                        <option value="System Admin">System Admin</option>
+                        <option value="Agent">Agent</option>
+                        <option value="IT Support">IT Support</option>
+                        <option value="HR">HR</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="complaint-type">Complaint Type:</label>
+                    <select id="complaint-type" name="complaint-type" required>
+                        <option value="Technical Issue"> Technical Issue</option>
+                        <option value="Service Issue"> Service Issue</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="issue-date">Issue Date & Time:</label>
+                    <input type="datetime-local" id="issue-date" name="issue-date" required>
+                </div>
+            </div>
+            <div class="form-row description-group">
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" rows="4" required></textarea>
+                </div>
+            </div>
+            <div class="button-container">
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+    <!-- Add any specific scripts here if needed -->
+{% endblock %}

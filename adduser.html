@@ -1,0 +1,214 @@
+{% extends "master.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    /* Scoped styles for the add user form */
+    .user-form {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        height: auto;  /* Adjust the height to fit the content */
+        padding: 20px; 
+    }
+    .form-container {
+        border: 2.5px solid #ddd;
+        border-radius: 1px;
+        width: 100%;
+        max-width: 1000px;  /* Set a maximum width to avoid overflow */
+        padding: 20px;
+        box-sizing: border-box;
+        margin-top: -30px;
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .form-row {
+        display: flex;
+        flex-wrap: wrap; 
+        gap: 15px; 
+        margin-bottom: 15px;
+    }
+    .form-group {
+        flex: 1; 
+        min-width: 300px; 
+    }
+    .form-container label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    .form-container input,
+    .form-container select,
+    .form-container textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 1px;
+        box-sizing: border-box;
+        background-color: transparent; 
+    }
+    .description-group {
+        flex-basis: 100%; 
+    }
+    .button-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        gap: 15px; /* Space between links */
+        flex-wrap: wrap; /* Allow for wrapping on small screens */
+    }
+    .submit-link,
+    .cancel-link {
+        padding: 10px 20px;
+        color: white;
+        text-decoration: none;
+        border-radius: 1px;
+        cursor: pointer;
+        font-size: 16px;
+        width: auto;
+    }
+    .submit-link {
+        background-color: #0e3457;
+    }
+    .submit-link:hover {
+        background-color: #0e3457;
+    }
+    .cancel-link {
+        background-color: #0e3457; /* Different color for cancel link */
+    }
+    .cancel-link:hover {
+        background-color:  #0e3457; /* Darker shade on hover */
+    }
+
+    /* Media queries for responsiveness */
+    @media (max-width: 768px) {
+        .form-container {
+            width: 90%;
+            padding: 10px;
+        }
+        .form-row {
+            flex-direction: column; /* Stack form fields vertically on small screens */
+        }
+        .form-group {
+            min-width: 100%;
+        }
+        .button-container {
+            flex-direction: column; /* Stack the buttons vertically */
+        }
+        .submit-link,
+        .cancel-link {
+            width: 100%; /* Make buttons full width on small screens */
+            margin-bottom: 10px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .user-form {
+            padding: 10px; /* Reduce padding on very small screens */
+        }
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="user-form" style="margin-top: 60px;">
+    <div class="form-container">
+        <h2>Add User</h2>
+        <form id="addUserForm" action="{% url 'adduser' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location:</label>
+                    <select id="location" name="location" required>
+                        <option value="" disabled selected>Select Location</option> <!-- Default option -->
+                        {% for location in locations %}
+                            <option value="{{ location.location }}">{{ location.location }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="department">Department:</label>
+                    <select id="department" name="department" required>
+                        <option value="" disabled selected>Select Department</option> <!-- Default option -->
+                        {% for department in departments %}
+                            <option value="{{ department.department }}">{{ department.department }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="date">Created At:</label>
+                    <input type="datetime-local" id="date" name="date" value="{{ current_ist_datetime }}" readonly 
+                    class="form-control">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="role">Role:</label>
+                    <select id="role" name="role" required>
+                        <option value="SuperAdmin">SuperAdmin</option>
+                        <option value="Admin">Admin</option>
+                        <option value="User">User</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="emp_level">Employee Level:</label>
+                    <select id="emp_level" name="emp_level" required>
+                        <option value="L0">L0</option>
+                        <option value="L1">L1</option>
+                        <option value="L2">L2</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+            </div>
+            <div class="button-container">
+                <button type="submit" class="submit-link" style="border-radius: 4px;">Save</button>
+                <a href="{% url 'superadmin' %}" class="cancel-link" style="border-radius: 4px;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Function to set the current date and time in IST
+    function setFixedDateTimeToIST() {
+        const dateInput = document.getElementById('date');
+
+        // Get the current UTC time and calculate IST offset
+        const now = new Date();
+        const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+        const istTime = new Date(now.getTime() + istOffset);
+
+        // Format the IST time for the datetime-local input field (YYYY-MM-DDTHH:MM)
+        const year = istTime.getFullYear();
+        const month = String(istTime.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const day = String(istTime.getDate()).padStart(2, '0');
+        const hours = String(istTime.getHours()).padStart(2, '0');
+        const minutes = String(istTime.getMinutes()).padStart(2, '0');
+
+        // Set the formatted value to the input
+        dateInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    // Call the function to set the current date and time
+    setFixedDateTimeToIST();
+</script>
+{% endblock %}

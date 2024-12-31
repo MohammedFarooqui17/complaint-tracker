@@ -1,0 +1,74 @@
+{% extends "master.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .report-container {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-weight: bold;
+            font-size: 45px;
+            margin: 50px 0 20px;
+            /* font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; */
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .button-container a {
+            width: 300px;
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #0e3457;
+            border-radius: 3px;
+            transition: background-color 0.3s ease;
+        }
+
+        .button-container a:hover {
+            background-color: #0e3457;
+        }
+
+        @media (max-width: 768px) {
+            .button-container a {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .button-container a {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="report-container">
+    <h1>Report</h1>
+    <div class="button-container">
+        <a href="{% url 'summaryreport' %}" id="summary-btn">Summary Resolutions</a>
+        <a href="{% url 'detailreport' %}" id="details-btn">Resolution Details</a>
+    </div>
+   
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <!-- Additional scripts if required -->
+{% endblock %}

@@ -1,0 +1,9 @@
+url : xyz
+
+find in url patterns
+
+if not found it will cause error 
+
+it will go to views in that url patterns
+
+

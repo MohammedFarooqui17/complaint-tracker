@@ -1,0 +1,137 @@
+{% extends "master.html" %}
+
+{% block styles %}
+<style>
+    .user-form {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        height: 75vh; 
+        padding: 20px; 
+
+    }
+    .form-container {
+        border: 2.5px solid #ddd;
+        border-radius: 1px;
+        width: 1000px; 
+        padding: 20px;
+        box-sizing: border-box;
+        margin-top: -30px; 
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .form-row {
+        display: flex;
+        flex-wrap: wrap; 
+        gap: 15px; 
+        margin-bottom: 15px;
+    }
+    .form-group {
+        flex: 1; 
+        min-width: 300px; 
+    }
+    .form-container label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    .form-container input,
+    .form-container select,
+    .form-container textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 1px;
+        box-sizing: border-box;
+        background-color: transparent; 
+    }
+    .button-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        gap: 15px; /* Space between buttons */
+    }
+    .button-container button {
+        padding: 10px 20px;
+        background-color: #0e3457;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    .button-container button:hover {
+        background-color: #0e3457;
+    }
+    .cancel-button {
+        background-color: #0e3457; /* Different color for cancel button */
+    }
+    .cancel-button:hover {
+        background-color: #0e3457; /* Darker shade on hover */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="user-form" style="margin-top: 60px;">
+    <div class="form-container">
+        <h2>Edit User</h2>
+        <form action="{% url 'edit' user.id %}" method="POST"> 
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" value="{{ user.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location:</label>
+                    <select id="location" name="location" required>
+                        <option value="" disabled>Select Location</option>
+                        {% for location in locations %}
+                            <option value="{{ location }}" {% if location == user.location %}selected{% endif %}>{{ location }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="department">Department:</label>
+                    <select id="department" name="department" required>
+                        <option value="" disabled>Select Department</option>
+                        {% for department in departments %}
+                            <option value="{{ department }}" {% if department == user.department %}selected{% endif %}>{{ department }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="role">Role:</label>
+                    <select id="role" name="role" required>
+                        <option value="SuperAdmin" {% if user.role == 'superadmin' %}selected{% endif %}>SuperAdmin</option>
+                        <option value="Admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                        <option value="User" {% if user.role == 'user' %}selected{% endif %}>User</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="emp_level">Employee Level:</label>
+                    <select id="emp_level" name="emp_level" required>
+                        <option value="L0" {% if user.emp_level == 'L0' %}selected{% endif %}>L0</option>
+                        <option value="L1" {% if user.emp_level == 'L1' %}selected{% endif %}>L1</option>
+                        <option value="L2" {% if user.emp_level == 'L2' %}selected{% endif %}>L2</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="button-container">
+                <button type="submit" style="color: white;">Update</button>
+                <button type="button" class="cancel-button" onclick="window.location.href='{% url 'superadmin' %}';" style="color: white;">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

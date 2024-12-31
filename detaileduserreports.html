@@ -1,0 +1,163 @@
+{% extends "sidebarU.html" %}
+ 
+{% block styles %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    .report-container {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1px;
+        text-align: center;
+        margin-bottom: 50px;
+        margin-top: -100px;
+    }
+
+    h1 {
+            font-weight: bold; 
+            font-size: 35px;
+            margin-top: 90px;
+            margin-right: 1000px;
+            margin-bottom: 40px;
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        }
+
+    .filter-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 80%;
+        margin-top: 20px;
+    }
+
+
+    .filter-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: nowrap; /* Ensures items stay on one line */
+        width: 100%;
+        margin-bottom: 50px;
+        gap: 10px; /* Adds space between items */
+    }
+
+
+    .filter-item {
+        flex: 1;
+        margin: 0 10px;
+        min-width: 150px; /* Ensures inputs don't shrink too much */
+    }
+
+
+    label {
+        font-size: 15px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+
+    input[type="date"], select {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        transition: border-color 0.3s ease;
+        box-sizing: border-box;
+    }
+
+
+    input[type="date"]:focus, select:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+
+    input[type="date"]:hover, select:hover {
+        border-color: #007bff;
+    }
+
+
+    .icon {
+        font-size: 150px;
+        color: #0e3152;
+        margin: 60px 0;
+    }
+
+
+    .download-button {
+        padding: 8px 20px;
+        font-size: 16px;
+        color: white;
+        background-color: #0e3152;
+        border: none;
+        border-radius: 1px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+        margin-top: -25px;
+    }
+
+
+    .download-button:hover {
+        background-color: #3165c6;
+    }
+</style>
+{% endblock %}
+ 
+{% block content %}
+<div class="report-container">
+    <h1>Detailed Reports</h1>
+    <form class="filter-form" action="{% url 'detailed_user_reports' %}" method="get">
+        <!-- Filter Inputs on the Same Line -->
+        <div class="filter-row">
+            <div class="filter-item">
+                <label for="from_date">From:</label>
+                <input type="date" id="from_date" name="fromdate" value="{{ from_date }}" required>
+            </div>
+            <div class="filter-item">
+                <label for="to_date">To:</label>
+                <input type="date" id="to_date" name="todate" value="{{ to_date }}" required>
+            </div>
+        </div>
+
+
+        <div class="filter-row">
+            <div class="filter-item">
+                <label for="status"></label>
+                <select id="status" name="status">
+                    <option value="">Select Status</option>
+                    {% for status in distinct_statuses %}
+                        <option value="{{ status }}" {% if status == request.GET.status %}selected{% endif %}>
+                            {{ status }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>  
+            <div class="filter-item">
+                <label for="complaint_type"></label>
+                <select id="complaint_type" name="complaint_type">
+                    <option value="">Select Complaint Type</option>
+                    {% for complaint in distinct_complaint_types %}
+                        <option value="{{ complaint }}" {% if complaint == complaint_type %}selected{% endif %}>{{ complaint }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <!-- Icon -->
+        <i class="fas fa-file-alt icon"></i>
+ 
+        <!-- Submit Button -->
+        <button type="submit" class="download-button">Download Reports</button>
+ 
+        <!-- Hidden Input -->
+        <input type="hidden" name="download" value="true">
+    </form>
+</div>
+{% endblock %}
+ 
+{% block scripts %}
+    <!-- Additional scripts if required -->
+{% endblock %}

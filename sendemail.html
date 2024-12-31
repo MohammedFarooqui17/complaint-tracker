@@ -1,0 +1,264 @@
+{% extends "master.html" %}
+
+{% block styles %}
+<!-- <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script> -->
+<style>
+    /* Custom styles for the form */
+    .container {
+        max-width: 900px;
+        margin-top: 10px;
+        margin-left: 250px;
+        margin-bottom: 50px;
+        padding: 0 15px;
+    }
+
+    .form-container {
+        background-color: transparent;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+
+    .form-title {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #333;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: 500;
+        color: #333;
+    }
+
+    .btn-primary {
+        background-color: #0e3152;
+        border-color: #0e3152;
+        padding: 10px 28px;
+        margin-left: 370px;
+        border-radius: 4px;
+        font-size: 16px;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #0e3152;
+        border-color: #0e3152;
+    }
+
+    .form-control {
+        font-size: 16px;
+        padding: 12px;
+        border-radius: 4px;
+        width: 100%;
+    }
+
+    .textarea-control {
+        resize: none;
+        height: 550px;
+    }
+
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .form-row .form-group {
+        flex: 1;
+        min-width: 280px;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 20px;
+        }
+
+        .form-row {
+            flex-direction: column;
+        }
+    }
+
+    .ck.ck-editor__main>.ck-editor__editable:not(.ck-focused) {
+        border-color: var(--ck-color-base-border);
+        height: 200px !important;
+    }
+
+    ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-blurred{
+        height: 200px;
+    }
+
+    ck ck-content ck-editor__editable ck-rounded-corners ck-editor__editable_inline ck-focused{
+        height: 200px;
+    }
+
+     
+
+    .ck ck-editor__main {
+        height: 250px;
+    }
+
+    .btn-cancel {
+        background-color: #0e3152;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 16px;
+        margin-left: 610px;
+        text-decoration: none;
+    }
+
+    .btn-cancel:hover {
+        background-color: #0e3152;
+    }
+
+    .ck ck-editor__main{
+        height: 200px;
+    }
+
+    .ck-focused {
+        height: 200px !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <div class="form-title"></div>
+        <!-- Form Starts -->
+        <form action="{% url 'sendemail' %}" method="POST" id="complaintForm">
+            {% csrf_token %}
+            <div class="form-row">
+                <!-- Department Dropdown -->
+                <div class="form-group">
+                    <label for="department"></label>
+                    <select id="department" name="department" class="form-control" required>
+                        <option value="">Select a Department</option>
+                        <option value="Sales">Sales</option>
+                        <option value="HR">HR</option>
+                        <option value="Support">Support</option>
+                    </select>
+                </div>
+
+                <!-- Complaint Type Dropdown -->
+                <div class="form-group">
+                    <label for="complaint_type"></label>
+                    <select id="complaint_type" name="complaint_type" class="form-control" required>
+                        <option value="">Select a Complaint Type</option>
+                        <option value="Product">Product</option>
+                        <option value="Service">Service</option>
+                        <option value="Billing">Billing</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- CKEditor Email Field -->
+            <div class="form-group">
+                <label for="email"></label>
+                <textarea name="email" style="visibility: visible;" id="email" class="form-control textarea-control"
+                    rows="5" placeholder="Enter Your Message......."></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" id="submitBtn" style="cursor: pointer;">Submit</button>
+                <!-- <a href="{% url 'superadmindashboard' %}" class="btn-cancel" id="cancelBtn">Cancel</a> -->
+            </div>
+        </form>
+        <!-- Form Ends -->
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+
+<script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
+<script>
+    let editor;
+
+    ClassicEditor
+        .create(document.querySelector('#email'))
+        .then(ed => {
+            editor = ed;
+        })
+        .catch(error => {
+            console.error(error);
+        });
+
+    // Function to strip HTML tags and return only plain text
+    function stripHTMLTags(input) {
+        var doc = new DOMParser().parseFromString(input, 'text/html');
+        return doc.body.textContent || doc.body.innerText || '';
+    }
+
+    // Handle form submission
+    document.querySelector('#complaintForm').addEventListener('submit', function (event) {
+        event.preventDefault();  // Prevent default form submission
+
+        // Ensure CKEditor content is updated to the textarea value
+        if (editor) {
+            let emailContent = editor.getData();
+            // Strip the HTML tags
+            let plainEmailContent = stripHTMLTags(emailContent);
+            document.querySelector('#email').value = plainEmailContent; // Set the stripped content to the textarea
+        }
+
+        // Validate the form
+        const department = document.getElementById('department').value;
+        const complaint_type = document.getElementById('complaint_type').value;
+        const email = document.getElementById('email').value;
+
+        // Validate all fields
+        if (department && complaint_type && email) {
+            submitFormViaAjax(department, complaint_type, email);
+        } else {
+            alert('Please fill in all fields');
+        }
+    });
+
+    // Submit form via AJAX
+    const submitFormViaAjax = (department, complaint_type, email) => {
+        const url = '{% url "sendemail" %}';  // Ensure this URL is correct
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        const formData = {
+            department: department,
+            complaint_type: complaint_type,
+            email: email
+        };
+
+        // Perform the AJAX request
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',  // Send data as JSON
+                'X-CSRFToken': csrfToken,  // CSRF protection
+            },
+            body: JSON.stringify(formData)  // Send data as JSON
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Complaint submitted successfully!') {
+                    alert('Complaint submitted successfully!');
+                    // Reset form after success
+                    document.getElementById('complaintForm').reset();
+                    editor.setData('');  // Clear CKEditor content
+                } else {
+                    alert('There was an error submitting your complaint.');
+                }
+            })
+            .catch(error => {
+                console.error('Error during form submission:', error);
+                alert('An error occurred while submitting the complaint.');
+            });
+    };
+</script>
+{% endblock %}
